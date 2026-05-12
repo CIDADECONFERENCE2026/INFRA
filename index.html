@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cidade Leadership — Infraestrutura</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&family=Barlow+Condensed:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sand:    #EDE8DF;
+  --sand2:   #E3DDD3;
+  --sand3:   #D4CEC4;
+  --gold:    #C8922A;
+  --gold2:   #E8A830;
+  --gold-lt: #F5E8CC;
+  --dark:    #1A1A18;
+  --dark2:   #2A2A26;
+  --dark3:   #3A3A34;
+  --green:   #1B3D2F;
+  --green2:  #244D3C;
+  --white:   #FAF8F4;
+  --muted:   #7A7468;
+  --muted2:  #9A9288;
+  --border:  rgba(26,26,24,0.12);
+  --border2: rgba(26,26,24,0.20);
+  --gold-border: rgba(200,146,42,0.35);
+  --r: 6px;
+  --r-lg: 12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--sand);
+  color: var(--dark);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--dark);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  max-width: 960px; margin: 0 auto; padding: 0 28px;
+  display: flex; align-items: center; height: 60px;
+}
+.logo { display: flex; flex-direction: column; margin-right: 28px; text-decoration: none; flex-shrink: 0; }
+.logo-top {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 15px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--white); line-height: 1;
+}
+.logo-top span { color: var(--gold2); }
+.logo-bot {
+  font-weight: 300; font-size: 9px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--muted2); margin-top: 3px;
+}
+.divider-v { width: 1px; height: 32px; background: rgba(255,255,255,0.1); margin-right: 20px; }
+.logo-mod {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600; font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold);
+}
+.nav-tabs { display: flex; margin-left: auto; }
+.nav-tab {
+  padding: 0 18px; height: 60px; display: flex; align-items: center;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.18s;
+  user-select: none; white-space: nowrap;
+}
+.nav-tab:hover { color: rgba(255,255,255,0.7); }
+.nav-tab.active { color: var(--gold2); border-bottom-color: var(--gold2); }
+
+/* ── PAGES ── */
+.page { display: none; max-width: 960px; margin: 0 auto; padding: 44px 28px 100px; }
+.page.active { display: block; animation: fadeUp 0.2s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── PAGE HEADER ── */
+.eyebrow {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+}
+.eyebrow::before { content:''; width:20px; height:1px; background:var(--gold); }
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: 30px; letter-spacing: 0.02em; text-transform: uppercase;
+  color: var(--dark); line-height: 1; margin-bottom: 4px;
+}
+.page-desc { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 32px;
+  box-shadow: 0 2px 12px rgba(26,26,24,0.06);
+}
+
+/* ── SECTION TITLE ── */
+.sec-title {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+}
+.sec-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.form-block {
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 20px; margin-bottom: 16px; background: var(--sand);
+  position: relative;
+}
+.form-block::before {
+  content:''; position:absolute; left:0; top:12px; bottom:12px;
+  width:3px; background:var(--border2); border-radius:0 2px 2px 0;
+}
+
+/* ── FORM ── */
+.row  { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.row1 { display:grid; grid-template-columns:1fr; gap:14px; }
+.row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+.fg  { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+.fg:last-child { margin-bottom:0; }
+
+.lbl {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dark3);
+}
+.req { color: var(--gold); margin-left: 2px; }
+
+.fc {
+  width: 100%; padding: 10px 13px;
+  border: 1px solid var(--border2); border-radius: var(--r);
+  background: var(--white); font-family: 'Barlow', sans-serif;
+  font-size: 14px; color: var(--dark); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s; appearance: none;
+}
+.fc:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,146,42,0.14); }
+.fc::placeholder { color: var(--muted2); }
+.fc.bad { border-color: #C0392B; box-shadow: 0 0 0 3px rgba(192,57,43,0.12); }
+textarea.fc { resize:vertical; min-height:84px; }
+select.fc {
+  cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A7468' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center; padding-right:32px;
+}
+
+/* ── TOGGLE ── */
+.tog {
+  background: var(--white); border: 1.5px solid var(--border2);
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; transition: all 0.15s; margin-bottom: 8px; gap: 12px;
+}
+.tog:hover { border-color: var(--gold); background: var(--gold-lt); }
+.tog.on { border-color: var(--gold); background: var(--gold-lt); }
+.tog-lbl { font-size: 14px; font-weight: 600; color: var(--dark); line-height: 1.3; }
+.tog-lbl small { display:block; font-weight:400; font-size:12px; color:var(--muted); margin-top:2px; }
+.sw {
+  width:42px; height:24px; background:var(--sand3);
+  border-radius:12px; position:relative; transition:background 0.2s;
+  flex-shrink:0; border:1px solid var(--border2);
+}
+.sw::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:16px; height:16px; background:white; border-radius:50%;
+  transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.tog.on .sw { background:var(--gold); border-color:var(--gold); }
+.tog.on .sw::after { transform:translateX(18px); }
+
+/* ── COND BLOCK ── */
+.cond {
+  display:none; margin-top:8px; padding:20px;
+  background:var(--white); border:1px solid var(--gold-border);
+  border-radius:var(--r); border-left:3px solid var(--gold);
+}
+.cond.open { display:block; animation:fadeUp 0.18s ease; }
+
+/* ── SUB HEAD ── */
+.sh {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  font-size:12px; letter-spacing:0.16em; text-transform:uppercase;
+  margin-bottom:14px; display:flex; align-items:center; gap:7px;
+}
+.sh-gold { color:var(--gold); }
+.sh-green { color:var(--green); }
+
+/* ── ALERT ── */
+.alert {
+  padding:12px 15px; border-radius:var(--r); font-size:13px;
+  display:flex; gap:10px; align-items:flex-start; margin:8px 0;
+}
+.alert svg { flex-shrink:0; margin-top:1px; }
+.a-warn { background:#FEF3C7; border:1px solid #F59E0B; color:#92400E; }
+.a-err  { background:#FEE2E2; border:1px solid #FCA5A5; color:#991B1B; }
+
+hr.sep { border:none; border-top:1px solid var(--border); margin:18px 0; }
+
+/* ── BTN ── */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 22px; border-radius:var(--r);
+  font-family:'Barlow Condensed',sans-serif; font-size:13px;
+  font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+  cursor:pointer; border:none; transition:all 0.15s; white-space:nowrap;
+}
+.btn-gold { background:var(--gold); color:var(--dark); }
+.btn-gold:hover { background:var(--gold2); }
+.btn-gold:disabled { background:var(--sand3); color:var(--muted2); cursor:not-allowed; }
+.btn-outline { background:transparent; color:var(--dark); border:1.5px solid var(--border2); }
+.btn-outline:hover { border-color:var(--dark3); background:var(--sand2); }
+.btn-ghost { background:transparent; color:var(--muted); padding:7px 10px; }
+.btn-ghost:hover { color:var(--dark); background:var(--sand2); }
+.btn-sm { padding:7px 14px; font-size:12px; }
+
+.form-footer {
+  display:flex; align-items:center; justify-content:flex-end;
+  gap:12px; margin-top:28px; padding-top:22px; border-top:1px solid var(--border);
+}
+
+/* ── SPINNER ── */
+.sp {
+  width:16px; height:16px;
+  border:2px solid rgba(26,26,24,0.2); border-top-color:var(--dark);
+  border-radius:50%; animation:spin 0.7s linear infinite; display:none;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ── BADGE ── */
+.badge {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px; border-radius:20px;
+  font-family:'Barlow Condensed',sans-serif; font-size:11px;
+  font-weight:700; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap;
+}
+.badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+.b-aberto    { background:#F3F4F6; color:#6B7280; border:1px solid #E5E7EB; }
+.b-exec      { background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; }
+.b-fechado   { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
+.b-cancelado { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
+
+/* ── FILTER BAR ── */
+.fbar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+.fbar .fc { flex:1; min-width:180px; }
+
+/* ── TABLE ── */
+.tw { border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:var(--white); box-shadow:0 2px 8px rgba(26,26,24,0.05); }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th {
+  background:var(--dark); color:rgba(255,255,255,0.55);
+  padding:11px 16px; text-align:left;
+  font-family:'Barlow Condensed',sans-serif; font-size:11px;
+  font-weight:700; letter-spacing:0.14em; text-transform:uppercase;
+  white-space:nowrap;
+}
+thead th:first-child { color:var(--gold); }
+tbody tr { border-bottom:1px solid var(--border); transition:background 0.1s; cursor:pointer; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--gold-lt); }
+tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
+.td-mono { font-family:monospace; font-size:11px; color:var(--muted); }
+.td-desc { max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); }
+.chip {
+  display:inline-block; padding:2px 8px; border-radius:3px;
+  font-family:'Barlow Condensed',sans-serif; font-size:11px;
+  font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  background:var(--sand2); color:var(--dark3);
+}
+.empty { padding:60px 20px; text-align:center; color:var(--muted); }
+.empty svg { margin:0 auto 12px; display:block; opacity:0.2; }
+.load-row { padding:44px; text-align:center; color:var(--muted); font-size:14px; }
+.dots::after { content:''; animation:dots 1.2s infinite; }
+@keyframes dots { 0%{content:''} 33%{content:'.'} 66%{content:'..'} 100%{content:'...'} }
+
+/* ── MODAL ── */
+.ov {
+  position:fixed; inset:0; background:rgba(26,26,24,0.55); z-index:200;
+  display:none; align-items:center; justify-content:center;
+  padding:24px; backdrop-filter:blur(3px);
+}
+.ov.open { display:flex; }
+.modal {
+  background:var(--white); border-radius:var(--r-lg);
+  padding:32px; max-width:700px; width:100%; max-height:88vh;
+  overflow-y:auto; box-shadow:0 24px 64px rgba(26,26,24,0.28);
+  animation:fadeUp 0.2s ease;
+}
+.mh {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:16px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border);
+}
+.mt { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:800; text-transform:uppercase; }
+.mid { font-family:monospace; font-size:11px; color:var(--muted); margin-top:3px; }
+.dg { display:grid; grid-template-columns:1fr 1fr; gap:13px; margin-bottom:13px; }
+.di { display:flex; flex-direction:column; gap:2px; }
+.dl { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted2); }
+.dv { font-size:14px; color:var(--dark); font-weight:500; }
+
+/* ── LOGIN ── */
+.login-wrap {
+  min-height:calc(100vh - 60px);
+  display:flex; align-items:center; justify-content:center; padding:40px 24px;
+}
+.login-box {
+  background:var(--white); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:40px; width:100%; max-width:400px;
+  box-shadow:0 8px 32px rgba(26,26,24,0.1);
+}
+.ll-top {
+  font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:22px;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--dark);
+  text-align:center; display:block; margin-bottom:3px;
+}
+.ll-top span { color:var(--gold); }
+.ll-sub {
+  font-weight:300; font-size:10px; letter-spacing:0.3em; text-transform:uppercase;
+  color:var(--muted); text-align:center; display:block; margin-bottom:24px;
+}
+.login-title {
+  font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:17px;
+  text-transform:uppercase; letter-spacing:0.06em; text-align:center; margin-bottom:4px;
+}
+.login-desc { font-size:13px; color:var(--muted); text-align:center; margin-bottom:22px; }
+
+.admin-panel { display:none; }
+.admin-panel.on { display:block; animation:fadeUp 0.2s ease; }
+
+.adm-top {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px; flex-wrap:wrap; gap:12px;
+}
+.adm-user { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+.adm-user strong { color:var(--dark); }
+
+.ecard {
+  background:var(--white); border:1px solid var(--border); border-radius:var(--r);
+  padding:16px 20px; margin-bottom:10px;
+  display:grid; grid-template-columns:1fr auto auto auto;
+  gap:12px; align-items:center;
+  transition:box-shadow 0.15s, border-color 0.15s;
+}
+.ecard:hover { box-shadow:0 2px 12px rgba(26,26,24,0.08); border-color:var(--gold-border); }
+.ec-name { font-weight:700; font-size:14px; margin-bottom:3px; }
+.ec-meta { font-size:12px; color:var(--muted); }
+
+/* ── TOAST ── */
+.toastwrap { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
+.toast {
+  padding:12px 17px; border-radius:var(--r); font-size:13px; font-weight:600;
+  display:flex; align-items:center; gap:9px;
+  box-shadow:0 4px 20px rgba(26,26,24,0.2); animation:fadeUp 0.2s ease; min-width:240px;
+}
+.t-ok  { background:var(--green); color:#fff; }
+.t-err { background:#991B1B; color:#fff; }
+.t-inf { background:var(--dark); color:#fff; }
+
+@media (max-width:640px) {
+  .row,.row3 { grid-template-columns:1fr; }
+  .dg { grid-template-columns:1fr; }
+  .ecard { grid-template-columns:1fr; }
+  .nav-tab { padding:0 11px; font-size:11px; }
+  .page { padding:28px 16px 80px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-top">cidade <span>LEADER</span>SHIP</div>
+      <div class="logo-bot">conference</div>
+    </a>
+    <div class="divider-v"></div>
+    <div class="logo-mod">Infraestrutura</div>
+    <nav class="nav-tabs">
+      <div class="nav-tab active" onclick="nav('solicitar',this)">Solicitar</div>
+      <div class="nav-tab" onclick="nav('consultar',this)">Consultar</div>
+      <div class="nav-tab" onclick="nav('gerenciar',this)">Gerenciar</div>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ TELA 1 — SOLICITAÇÃO ═══ -->
+<main id="pg-solicitar" class="page active">
+  <div class="eyebrow">Infraestrutura</div>
+  <div class="page-title">Nova Solicitação</div>
+  <div class="page-desc">Preencha todos os campos para registrar sua demanda.</div>
+
+  <div class="card">
+    <div class="sec-title">Solicitante</div>
+    <div class="form-block" style="margin-bottom:20px">
+      <div class="row">
+        <div class="fg">
+          <label class="lbl">Nome completo <span class="req">*</span></label>
+          <input type="text" id="f-nome" class="fc" placeholder="Seu nome completo">
+        </div>
+        <div class="fg">
+          <label class="lbl">Área / Ministério <span class="req">*</span></label>
+          <input type="text" id="f-area" class="fc" placeholder="Ex: Louvor, Mídia, Eventos...">
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">Tipo de Demanda</div>
+
+    <!-- Opção 1: Movimentação entre locais -->
+    <div class="tog" id="tog-mov" onclick="tipo('mov')">
+      <div class="tog-lbl">Movimentação entre auditórios / locais diferentes
+        <small>Deslocamento de itens de um ponto a outro</small>
+      </div>
+      <div class="sw" id="sw-mov"></div>
+    </div>
+    <div class="cond" id="cond-mov">
+      <div class="sh sh-gold">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
+        Ida
+      </div>
+      <div class="row3">
+        <div class="fg"><label class="lbl">Dia <span class="req">*</span></label><input type="date" id="f-ida-dia" class="fc"></div>
+        <div class="fg"><label class="lbl">Hora <span class="req">*</span></label><input type="time" id="f-ida-hora" class="fc"></div>
+        <div class="fg"><label class="lbl">Precisa de veículo? <span class="req">*</span></label>
+          <select id="f-ida-veiculo" class="fc"><option value="Não">Não</option><option value="Sim">Sim</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="fg"><label class="lbl">Local de Origem <span class="req">*</span></label><input type="text" id="f-ida-origem" class="fc" placeholder="De onde vai sair"></div>
+        <div class="fg"><label class="lbl">Local de Destino <span class="req">*</span></label><input type="text" id="f-ida-destino" class="fc" placeholder="Para onde vai"></div>
+      </div>
+      <div class="row1">
+        <div class="fg"><label class="lbl">Descrição dos itens <span class="req">*</span></label><textarea id="f-ida-desc" class="fc" placeholder="Liste e descreva os itens que serão movimentados..."></textarea></div>
+      </div>
+      <div class="row">
+        <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-ida-acomp" class="fc" placeholder="Nome do responsável"></div>
+        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-ida-tel" class="fc" placeholder="(xx) xxxxx-xxxx"></div>
+      </div>
+
+      <div class="tog" id="tog-ida-auth" onclick="tauth('ida')">
+        <div class="tog-lbl">O acesso ao local precisa de autorização? <span class="req">*</span></div>
+        <div class="sw" id="sw-ida-auth"></div>
+      </div>
+      <div class="cond" id="cond-ida-auth">
+        <div class="alert a-warn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          <span>Atenção: a autorização deve ser providenciada <strong>previamente pelo solicitante</strong>. A Infraestrutura da Conferência <strong>não realiza liberação de acesso.</strong></span>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div class="tog" id="tog-dev" onclick="tdev()">
+        <div class="tog-lbl">O item precisa ser devolvido? <span class="req">*</span></div>
+        <div class="sw" id="sw-dev"></div>
+      </div>
+      <div class="cond" id="cond-dev">
+        <div class="sh sh-green" style="margin-top:4px">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5 5-5M18 12H6"/></svg>
+          Devolução
+        </div>
+        <div class="row3">
+          <div class="fg"><label class="lbl">Dia <span class="req">*</span></label><input type="date" id="f-dev-dia" class="fc"></div>
+          <div class="fg"><label class="lbl">Hora <span class="req">*</span></label><input type="time" id="f-dev-hora" class="fc"></div>
+          <div class="fg"><label class="lbl">Precisa de veículo? <span class="req">*</span></label>
+            <select id="f-dev-veiculo" class="fc"><option value="Não">Não</option><option value="Sim">Sim</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="fg"><label class="lbl">Local de Origem <span class="req">*</span></label><input type="text" id="f-dev-origem" class="fc" placeholder="De onde vai sair"></div>
+          <div class="fg"><label class="lbl">Local de Destino <span class="req">*</span></label><input type="text" id="f-dev-destino" class="fc" placeholder="Para onde vai"></div>
+        </div>
+        <div class="row1">
+          <div class="fg"><label class="lbl">Descrição <span class="req">*</span></label><textarea id="f-dev-desc" class="fc" placeholder="Detalhes da devolução..."></textarea></div>
+        </div>
+        <div class="row">
+          <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-dev-acomp" class="fc" placeholder="Nome do responsável"></div>
+          <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-dev-tel" class="fc" placeholder="(xx) xxxxx-xxxx"></div>
+        </div>
+        <div class="tog" id="tog-dev-auth" onclick="tauth('dev')">
+          <div class="tog-lbl">O acesso ao local precisa de autorização? <span class="req">*</span></div>
+          <div class="sw" id="sw-dev-auth"></div>
+        </div>
+        <div class="cond" id="cond-dev-auth">
+          <div class="alert a-warn">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <span>Atenção: a autorização deve ser providenciada <strong>previamente pelo solicitante</strong>. A Infraestrutura da Conferência <strong>não realiza liberação de acesso.</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opção 2: Mesmo local -->
+    <div class="tog" id="tog-loc" onclick="tipo('loc')">
+      <div class="tog-lbl">Movimentação no mesmo local / mesmo auditório
+        <small>Deslocamento dentro de uma mesma área</small>
+      </div>
+      <div class="sw" id="sw-loc"></div>
+    </div>
+    <div class="cond" id="cond-loc">
+      <div class="row3">
+        <div class="fg"><label class="lbl">Dia <span class="req">*</span></label><input type="date" id="f-loc-dia" class="fc"></div>
+        <div class="fg"><label class="lbl">Hora <span class="req">*</span></label><input type="time" id="f-loc-hora" class="fc"></div>
+        <div class="fg"><label class="lbl">Precisa de veículo? <span class="req">*</span></label>
+          <select id="f-loc-veiculo" class="fc"><option value="Não">Não</option><option value="Sim">Sim</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="fg"><label class="lbl">Local <span class="req">*</span></label><input type="text" id="f-loc-local" class="fc" placeholder="Nome do local"></div>
+        <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-loc-acomp" class="fc" placeholder="Nome do responsável"></div>
+      </div>
+      <div class="row">
+        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-loc-tel" class="fc" placeholder="(xx) xxxxx-xxxx"></div>
+        <div class="fg"></div>
+      </div>
+      <div class="row1">
+        <div class="fg"><label class="lbl">Descrição <span class="req">*</span></label><textarea id="f-loc-desc" class="fc" placeholder="Descreva a demanda em detalhes..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- Opção 3: Manutenção -->
+    <div class="tog" id="tog-man" onclick="tipo('man')">
+      <div class="tog-lbl">Manutenção
+        <small>Reparos, consertos ou serviços técnicos</small>
+      </div>
+      <div class="sw" id="sw-man"></div>
+    </div>
+    <div class="cond" id="cond-man">
+      <div class="alert a-err">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+        <div><strong>Este canal não atende solicitações de manutenção.</strong><br>
+        Manutenções devem ser encaminhadas à <strong>Infraestrutura da Igreja da Cidade</strong>, e não à Infraestrutura da Conferência.</div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn btn-outline" onclick="limpar()">Limpar</button>
+      <button class="btn btn-gold" id="btn-env" onclick="enviar()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        <span id="btn-txt">Enviar Solicitação</span>
+        <div class="sp" id="sp-env"></div>
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- ═══ TELA 2 — CONSULTA ═══ -->
+<main id="pg-consultar" class="page">
+  <div class="eyebrow">Infraestrutura</div>
+  <div class="page-title">Consultar Demandas</div>
+  <div class="page-desc">Acompanhe o andamento das solicitações em tempo real.</div>
+
+  <div class="fbar">
+    <input type="text" class="fc" id="flt-txt" placeholder="Buscar por nome, área ou descrição..." oninput="fltConsulta()">
+    <select class="fc" id="flt-st" style="flex:0;min-width:160px" onchange="fltConsulta()">
+      <option value="">Todos os status</option>
+      <option>Aberto</option><option>Em execução</option>
+      <option>Fechado</option><option>Cancelado</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="loadConsulta()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a8 8 0 0114.93-2M20 15a8 8 0 01-14.93 2"/></svg>
+      Atualizar
+    </button>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Data / Hora</th><th>Solicitante</th><th>Área</th><th>Tipo</th><th>Descrição</th><th>Status</th></tr>
+      </thead>
+      <tbody id="tbody-consulta">
+        <tr><td colspan="7"><div class="load-row">Carregando<span class="dots"></span></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="ov" id="modal-ov" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="mh">
+      <div>
+        <div class="mt" id="m-title">Demanda</div>
+        <div class="mid" id="m-id"></div>
+      </div>
+      <button class="btn btn-ghost" style="padding:6px" onclick="document.getElementById('modal-ov').classList.remove('open')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="m-body"></div>
+  </div>
+</div>
+
+<!-- ═══ TELA 3 — GERENCIAR ═══ -->
+<main id="pg-gerenciar" class="page">
+
+  <div id="login-wrap" class="login-wrap">
+    <div class="login-box">
+      <span class="ll-top">cidade <span>LEADER</span>SHIP</span>
+      <span class="ll-sub">conference — infraestrutura</span>
+      <hr class="sep">
+      <div class="login-title">Acesso Restrito</div>
+      <div class="login-desc">Entre com suas credenciais para gerenciar as demandas.</div>
+      <div class="fg"><label class="lbl">E-mail</label><input type="email" id="l-email" class="fc" placeholder="seu@email.com"></div>
+      <div class="fg" style="margin-bottom:18px"><label class="lbl">Senha</label>
+        <input type="password" id="l-senha" class="fc" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+      </div>
+      <div id="l-erro" style="display:none" class="alert a-err">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M15 9l-6 6M9 9l6 6"/></svg>
+        Credenciais inválidas.
+      </div>
+      <button class="btn btn-gold" style="width:100%;margin-top:6px" onclick="login()">
+        <span id="l-btxt">Entrar</span>
+        <div class="sp" id="sp-login" style="border-top-color:var(--dark)"></div>
+      </button>
+    </div>
+  </div>
+
+  <div id="adm-panel" class="admin-panel">
+    <div class="eyebrow">Infraestrutura</div>
+    <div class="page-title">Gerenciar Demandas</div>
+    <div class="page-desc">Atualize status e registre observações.</div>
+
+    <div class="adm-top">
+      <div class="fbar" style="margin:0;flex:1">
+        <input type="text" class="fc" id="adm-flt" placeholder="Buscar..." oninput="fltAdmin()">
+        <select class="fc" id="adm-stflt" style="flex:0;min-width:160px" onchange="fltAdmin()">
+          <option value="">Todos</option>
+          <option>Aberto</option><option>Em execução</option>
+          <option>Fechado</option><option>Cancelado</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="loadAdmin()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a8 8 0 0114.93-2M20 15a8 8 0 01-14.93 2"/></svg>
+          Atualizar
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="adm-user">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <strong id="adm-nome">Admin</strong>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="logout()">Sair</button>
+      </div>
+    </div>
+    <div id="adm-lista"><div class="load-row">Carregando<span class="dots"></span></div></div>
+  </div>
+</main>
+
+<div class="toastwrap" id="toasts"></div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+const API = 'https://script.google.com/macros/s/AKfycbzwaN1UEpSYKYKQ_XK9nbayYXia9Dk1FSTW0tYyfhLh7mk0RAKapTNKplB3SHokTLtkKA/exec';
+const USERS = {
+  'ernane.novale@gmail.com': 'Conference2026'
+};
+
+// ══════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════
+function nav(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pg-' + id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'consultar') loadConsulta();
+  if (id === 'gerenciar' && logado) loadAdmin();
+}
+
+// ══════════════════════════════════════════
+// FORM TOGGLES
+// ══════════════════════════════════════════
+let tipoAtivo = null;
+
+function tipo(t) {
+  if (tipoAtivo === t) {
+    tipoAtivo = null;
+    document.getElementById('tog-' + t).classList.remove('on');
+    document.getElementById('cond-' + t).classList.remove('open');
+    return;
+  }
+  if (tipoAtivo) {
+    document.getElementById('tog-' + tipoAtivo).classList.remove('on');
+    document.getElementById('cond-' + tipoAtivo).classList.remove('open');
+  }
+  tipoAtivo = t;
+  document.getElementById('tog-' + t).classList.add('on');
+  document.getElementById('cond-' + t).classList.add('open');
+}
+
+function tauth(p) {
+  const tog = document.getElementById('tog-' + p + '-auth');
+  const cond = document.getElementById('cond-' + p + '-auth');
+  tog.classList.toggle('on');
+  cond.classList.toggle('open', tog.classList.contains('on'));
+}
+
+function tdev() {
+  const tog = document.getElementById('tog-dev');
+  const cond = document.getElementById('cond-dev');
+  tog.classList.toggle('on');
+  cond.classList.toggle('open', tog.classList.contains('on'));
+}
+
+// ══════════════════════════════════════════
+// FORM VALIDATION & SUBMIT
+// ══════════════════════════════════════════
+const g = id => (document.getElementById(id)?.value || '').trim();
+function bad(id, msg) {
+  document.getElementById(id)?.classList.add('bad');
+  document.getElementById(id)?.focus();
+  toast(msg, 'err');
+}
+function clearBad() { document.querySelectorAll('.bad').forEach(e => e.classList.remove('bad')); }
+
+function validar() {
+  clearBad();
+  if (!g('f-nome'))  { bad('f-nome','Nome do solicitante é obrigatório.'); return false; }
+  if (!g('f-area'))  { bad('f-area','Área/Ministério é obrigatório.'); return false; }
+  if (!tipoAtivo || tipoAtivo === 'man') { toast('Selecione um tipo de demanda válido.','err'); return false; }
+
+  if (tipoAtivo === 'mov') {
+    const flds = [
+      ['f-ida-dia','Dia da ida'],['f-ida-hora','Hora da ida'],
+      ['f-ida-origem','Local de origem'],['f-ida-destino','Local de destino'],
+      ['f-ida-desc','Descrição dos itens'],
+      ['f-ida-acomp','Acompanhante da ida'],['f-ida-tel','Telefone da ida']
+    ];
+    for (const [id, lbl] of flds) { if (!g(id)) { bad(id, lbl + ' é obrigatório.'); return false; } }
+
+    if (document.getElementById('tog-dev').classList.contains('on')) {
+      const flds2 = [
+        ['f-dev-dia','Dia da devolução'],['f-dev-hora','Hora da devolução'],
+        ['f-dev-origem','Origem da devolução'],['f-dev-destino','Destino da devolução'],
+        ['f-dev-desc','Descrição da devolução'],
+        ['f-dev-acomp','Acompanhante da devolução'],['f-dev-tel','Telefone da devolução']
+      ];
+      for (const [id, lbl] of flds2) { if (!g(id)) { bad(id, lbl + ' é obrigatório.'); return false; } }
+    }
+  }
+
+  if (tipoAtivo === 'loc') {
+    const flds = [
+      ['f-loc-dia','Dia'],['f-loc-hora','Hora'],['f-loc-local','Local'],
+      ['f-loc-acomp','Acompanhante'],['f-loc-tel','Telefone'],['f-loc-desc','Descrição']
+    ];
+    for (const [id, lbl] of flds) { if (!g(id)) { bad(id, lbl + ' é obrigatório.'); return false; } }
+  }
+
+  return true;
+}
+
+function coletar() {
+  const d = {
+    solicitante: g('f-nome'), area: g('f-area'), tipo: tipoAtivo,
+    timestamp: new Date().toLocaleString('pt-BR'), status: 'Aberto', observacoes: ''
+  };
+  if (tipoAtivo === 'mov') {
+    Object.assign(d, {
+      dia_ida: g('f-ida-dia'), hora_ida: g('f-ida-hora'),
+      origem_ida: g('f-ida-origem'), destino_ida: g('f-ida-destino'),
+      veiculo_ida: g('f-ida-veiculo'), desc_ida: g('f-ida-desc'),
+      acomp_ida: g('f-ida-acomp'), tel_ida: g('f-ida-tel'),
+      auth_ida: document.getElementById('tog-ida-auth').classList.contains('on') ? 'Sim' : 'Não',
+      devolucao: document.getElementById('tog-dev').classList.contains('on') ? 'Sim' : 'Não'
+    });
+    if (d.devolucao === 'Sim') {
+      Object.assign(d, {
+        dia_dev: g('f-dev-dia'), hora_dev: g('f-dev-hora'),
+        origem_dev: g('f-dev-origem'), destino_dev: g('f-dev-destino'),
+        veiculo_dev: g('f-dev-veiculo'), desc_dev: g('f-dev-desc'),
+        acomp_dev: g('f-dev-acomp'), tel_dev: g('f-dev-tel'),
+        auth_dev: document.getElementById('tog-dev-auth').classList.contains('on') ? 'Sim' : 'Não'
+      });
+    }
+  }
+  if (tipoAtivo === 'loc') {
+    Object.assign(d, {
+      dia: g('f-loc-dia'), hora: g('f-loc-hora'), local: g('f-loc-local'),
+      veiculo: g('f-loc-veiculo'), acomp: g('f-loc-acomp'),
+      tel: g('f-loc-tel'), descricao: g('f-loc-desc')
+    });
+  }
+  return d;
+}
+
+async function enviar() {
+  if (!validar()) return;
+  const dados = coletar();
+  const btn = document.getElementById('btn-env');
+  const txt = document.getElementById('btn-txt');
+  const sp  = document.getElementById('sp-env');
+  btn.disabled = true; txt.textContent = 'Enviando...'; sp.style.display = 'block';
+  try {
+    const r = await fetch(API, { method:'POST', body: JSON.stringify({ acao:'criar', dados }) });
+    const j = await r.json();
+    if (j.ok) { toast('Solicitação enviada! Protocolo: ' + j.id, 'ok'); limpar(); }
+    else throw new Error(j.erro);
+  } catch { toast('Erro ao enviar. Verifique a conexão.', 'err'); }
+  finally { btn.disabled=false; txt.textContent='Enviar Solicitação'; sp.style.display='none'; }
+}
+
+function limpar() {
+  document.querySelectorAll('#pg-solicitar input,#pg-solicitar textarea,#pg-solicitar select')
+    .forEach(el => el.tagName==='SELECT' ? (el.selectedIndex=0) : (el.value=''));
+  clearBad();
+  ['mov','loc','man'].forEach(t => {
+    document.getElementById('tog-'+t)?.classList.remove('on');
+    document.getElementById('cond-'+t)?.classList.remove('open');
+  });
+  ['ida-auth','dev-auth'].forEach(a => {
+    document.getElementById('tog-'+a)?.classList.remove('on');
+    document.getElementById('cond-'+a)?.classList.remove('open');
+  });
+  document.getElementById('tog-dev')?.classList.remove('on');
+  document.getElementById('cond-dev')?.classList.remove('open');
+  tipoAtivo = null;
+}
+
+// ══════════════════════════════════════════
+// CONSULTA
+// ══════════════════════════════════════════
+let dadosCons = [];
+const bcls = { 'Aberto':'b-aberto','Em execução':'b-exec','Fechado':'b-fechado','Cancelado':'b-cancelado' };
+
+async function loadConsulta() {
+  const tb = document.getElementById('tbody-consulta');
+  tb.innerHTML = '<tr><td colspan="7"><div class="load-row">Carregando<span class="dots"></span></div></td></tr>';
+  try {
+    const r = await fetch(API + '?acao=listar');
+    const j = await r.json();
+    dadosCons = j.dados || [];
+    fltConsulta();
+  } catch { tb.innerHTML = '<tr><td colspan="7"><div class="load-row" style="color:#991B1B">Erro ao carregar. Verifique a URL do Apps Script.</div></td></tr>'; }
+}
+
+function fltConsulta() {
+  const txt = document.getElementById('flt-txt').value.toLowerCase();
+  const st  = document.getElementById('flt-st').value;
+  renderConsulta(dadosCons.filter(d =>
+    (!txt || [d.solicitante,d.area,d.desc_ida,d.descricao].some(x=>(x||'').toLowerCase().includes(txt))) &&
+    (!st || d.status===st)
+  ));
+}
+
+function renderConsulta(lista) {
+  const tb = document.getElementById('tbody-consulta');
+  if (!lista.length) {
+    tb.innerHTML = `<tr><td colspan="7"><div class="empty">
+      <svg width="38" height="38" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <p>Nenhuma demanda encontrada.</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = lista.map((d,i) => {
+    const tp = d.tipo==='mov'?'Movimentação':d.tipo==='loc'?'Mesmo auditório':'-';
+    const st = d.status||'Aberto';
+    const idx = dadosCons.indexOf(d);
+    return `<tr onclick="openDetalhe(${idx})">
+      <td class="td-mono">${d.id||(i+1)}</td>
+      <td class="td-mono" style="white-space:nowrap">${d.timestamp||'-'}</td>
+      <td style="font-weight:600">${d.solicitante||'-'}</td>
+      <td style="color:var(--muted)">${d.area||'-'}</td>
+      <td><span class="chip">${tp}</span></td>
+      <td class="td-desc">${d.desc_ida||d.descricao||'-'}</td>
+      <td><span class="badge ${bcls[st]||'b-aberto'}">${st}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function openDetalhe(idx) {
+  const d = dadosCons[idx];
+  const st = d.status||'Aberto';
+  document.getElementById('m-title').textContent = 'Solicitação — ' + (d.solicitante||'');
+  document.getElementById('m-id').textContent = 'Protocolo ' + (d.id||(idx+1)) + '  ·  ' + (d.timestamp||'');
+  let h = `<div class="dg">
+    <div class="di"><div class="dl">Solicitante</div><div class="dv">${d.solicitante||'-'}</div></div>
+    <div class="di"><div class="dl">Área</div><div class="dv">${d.area||'-'}</div></div>
+    <div class="di"><div class="dl">Tipo</div><div class="dv">${d.tipo==='mov'?'Movimentação entre locais':d.tipo==='loc'?'Mesmo auditório':'-'}</div></div>
+    <div class="di"><div class="dl">Status</div><div class="dv"><span class="badge ${bcls[st]||'b-aberto'}">${st}</span></div></div>
+  </div>`;
+  if (d.tipo==='mov') {
+    h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Ida</div>
+    <div class="dg">
+      <div class="di"><div class="dl">Data / Hora</div><div class="dv">${d.dia_ida||'-'} ${d.hora_ida||''}</div></div>
+      <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo_ida||'-'}</div></div>
+      <div class="di"><div class="dl">Origem</div><div class="dv">${d.origem_ida||'-'}</div></div>
+      <div class="di"><div class="dl">Destino</div><div class="dv">${d.destino_ida||'-'}</div></div>
+      <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp_ida||'-'}</div></div>
+      <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel_ida||'-'}</div></div>
+      <div class="di" style="grid-column:1/-1"><div class="dl">Descrição</div><div class="dv">${d.desc_ida||'-'}</div></div>
+      <div class="di"><div class="dl">Autorização</div><div class="dv">${d.auth_ida||'Não'}</div></div>
+    </div>`;
+    if (d.devolucao==='Sim') {
+      h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Devolução</div>
+      <div class="dg">
+        <div class="di"><div class="dl">Data / Hora</div><div class="dv">${d.dia_dev||'-'} ${d.hora_dev||''}</div></div>
+        <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo_dev||'-'}</div></div>
+        <div class="di"><div class="dl">Origem</div><div class="dv">${d.origem_dev||'-'}</div></div>
+        <div class="di"><div class="dl">Destino</div><div class="dv">${d.destino_dev||'-'}</div></div>
+        <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp_dev||'-'}</div></div>
+        <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel_dev||'-'}</div></div>
+        <div class="di"><div class="dl">Autorização</div><div class="dv">${d.auth_dev||'Não'}</div></div>
+      </div>`;
+    }
+  }
+  if (d.tipo==='loc') {
+    h += `<hr class="sep"><div class="dg">
+      <div class="di"><div class="dl">Data / Hora</div><div class="dv">${d.dia||'-'} ${d.hora||''}</div></div>
+      <div class="di"><div class="dl">Local</div><div class="dv">${d.local||'-'}</div></div>
+      <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo||'-'}</div></div>
+      <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp||'-'}</div></div>
+      <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel||'-'}</div></div>
+      <div class="di" style="grid-column:1/-1"><div class="dl">Descrição</div><div class="dv">${d.descricao||'-'}</div></div>
+    </div>`;
+  }
+  if (d.observacoes) {
+    h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Observações da equipe</div>
+    <p style="font-size:14px;background:var(--gold-lt);padding:12px;border-radius:var(--r);border-left:3px solid var(--gold);color:var(--dark)">${d.observacoes}</p>`;
+  }
+  document.getElementById('m-body').innerHTML = h;
+  document.getElementById('modal-ov').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target===document.getElementById('modal-ov'))
+    document.getElementById('modal-ov').classList.remove('open');
+}
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+let logado = false;
+
+function login() {
+  const em = document.getElementById('l-email').value.trim().toLowerCase();
+  const pw = document.getElementById('l-senha').value;
+  const er = document.getElementById('l-erro');
+  if (USERS[em] && USERS[em] === pw) {
+    logado = true; er.style.display = 'none';
+    document.getElementById('login-wrap').style.display = 'none';
+    document.getElementById('adm-panel').classList.add('on');
+    document.getElementById('adm-nome').textContent = em;
+    loadAdmin();
+  } else { er.style.display = 'flex'; }
+}
+
+function logout() {
+  logado = false;
+  document.getElementById('login-wrap').style.display = 'flex';
+  document.getElementById('adm-panel').classList.remove('on');
+  document.getElementById('l-email').value = '';
+  document.getElementById('l-senha').value = '';
+  document.getElementById('l-erro').style.display = 'none';
+}
+
+// ══════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════
+let dadosAdm = [];
+
+async function loadAdmin() {
+  document.getElementById('adm-lista').innerHTML = '<div class="load-row">Carregando<span class="dots"></span></div>';
+  try {
+    const r = await fetch(API + '?acao=listar');
+    const j = await r.json();
+    dadosAdm = j.dados || [];
+    fltAdmin();
+  } catch { document.getElementById('adm-lista').innerHTML = '<div class="load-row" style="color:#991B1B">Erro ao carregar.</div>'; }
+}
+
+function fltAdmin() {
+  const txt = document.getElementById('adm-flt').value.toLowerCase();
+  const st  = document.getElementById('adm-stflt').value;
+  renderAdmin(dadosAdm.filter(d =>
+    (!txt || [d.solicitante,d.area].some(x=>(x||'').toLowerCase().includes(txt))) &&
+    (!st || d.status===st)
+  ));
+}
+
+function renderAdmin(lista) {
+  const el = document.getElementById('adm-lista');
+  if (!lista.length) { el.innerHTML = '<div class="load-row">Nenhuma demanda encontrada.</div>'; return; }
+  el.innerHTML = lista.map(d => {
+    const idx = dadosAdm.indexOf(d);
+    const tp = d.tipo==='mov'?'Movimentação':d.tipo==='loc'?'Mesmo auditório':'-';
+    const st = d.status||'Aberto';
+    return `<div class="ecard">
+      <div>
+        <div class="ec-name">${d.solicitante||'-'} <span style="font-weight:400;color:var(--muted)">· ${d.area||''}</span></div>
+        <div class="ec-meta"><span class="chip" style="margin-right:6px">${tp}</span>${d.timestamp||''}</div>
+      </div>
+      <select class="fc" style="width:160px;font-size:13px" id="st-${idx}" onchange="updStatus(${idx})">
+        ${['Aberto','Em execução','Fechado','Cancelado'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <button class="btn btn-ghost btn-sm" style="border:1px solid var(--border2)" onclick="editObs(${idx})" title="Editar observações">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        Obs.
+      </button>
+      <span class="badge ${bcls[st]||'b-aberto'}">${st}</span>
+    </div>`;
+  }).join('');
+}
+
+async function updStatus(idx) {
+  const d = dadosAdm[idx];
+  d.status = document.getElementById('st-' + idx).value;
+  try {
+    await fetch(API, { method:'POST', body: JSON.stringify({ acao:'atualizar', id:d.id, status:d.status, observacoes:d.observacoes||'' }) });
+    toast('Status atualizado para "' + d.status + '"', 'ok');
+    fltAdmin();
+  } catch { toast('Erro ao atualizar.', 'err'); }
+}
+
+function editObs(idx) {
+  const d = dadosAdm[idx];
+  const obs = prompt('Observações da equipe:', d.observacoes||'');
+  if (obs===null) return;
+  d.observacoes = obs;
+  fetch(API, { method:'POST', body: JSON.stringify({ acao:'atualizar', id:d.id, status:d.status, observacoes:obs }) })
+    .then(() => toast('Observações salvas.', 'ok'))
+    .catch(() => toast('Erro ao salvar.', 'err'));
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function toast(msg, tp='inf') {
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = `toast t-${tp}`;
+  const ic = tp==='ok'
+    ? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>'
+    : tp==='err'
+    ? '<circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M15 9l-6 6M9 9l6 6"/>'
+    : '<circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/>';
+  el.innerHTML = `<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">${ic}</svg>${msg}`;
+  c.appendChild(el);
+  setTimeout(() => el.remove(), 4500);
+}
+</script>
+</body>
+</html>
