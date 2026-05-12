@@ -565,14 +565,29 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
         <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-ida-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric" autocomplete="tel"></div>
       </div>
 
-      <div class="tog" id="tog-ida-auth" onclick="tauth('ida')">
-        <div class="tog-lbl">O acesso ao local precisa de autorização? <span class="req">*</span></div>
-        <div class="sw" id="sw-ida-auth"></div>
+      <div class="row" style="margin-bottom:0">
+        <div class="fg">
+          <label class="lbl">O acesso ao local precisa de autorização? <span class="req">*</span></label>
+          <select id="f-ida-auth" class="fc" onchange="toggleAuth('ida')">
+            <option value="Não">Não</option>
+            <option value="Sim">Sim</option>
+          </select>
+        </div>
       </div>
       <div class="cond" id="cond-ida-auth">
-        <div class="alert a-warn">
+        <div class="alert a-warn" style="margin-bottom:12px">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
           <span>Atenção: a autorização deve ser providenciada <strong>previamente pelo solicitante</strong>. A Infraestrutura da Conferência <strong>não realiza liberação de acesso.</strong></span>
+        </div>
+        <div class="row">
+          <div class="fg">
+            <label class="lbl">Quem vai abrir / acompanhar o acesso <span class="req">*</span></label>
+            <input type="text" id="f-ida-auth-acomp" class="fc" placeholder="Ex: João da portaria, segurança...">
+          </div>
+          <div class="fg">
+            <label class="lbl">Telefone do responsável <span class="req">*</span></label>
+            <input type="tel" id="f-ida-auth-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric" autocomplete="tel">
+          </div>
         </div>
       </div>
 
@@ -605,14 +620,29 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
           <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-dev-acomp" class="fc" placeholder="Nome do responsável"></div>
           <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-dev-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric" autocomplete="tel"></div>
         </div>
-        <div class="tog" id="tog-dev-auth" onclick="tauth('dev')">
-          <div class="tog-lbl">O acesso ao local precisa de autorização? <span class="req">*</span></div>
-          <div class="sw" id="sw-dev-auth"></div>
+        <div class="row" style="margin-bottom:0">
+          <div class="fg">
+            <label class="lbl">O acesso ao local precisa de autorização? <span class="req">*</span></label>
+            <select id="f-dev-auth" class="fc" onchange="toggleAuth('dev')">
+              <option value="Não">Não</option>
+              <option value="Sim">Sim</option>
+            </select>
+          </div>
         </div>
         <div class="cond" id="cond-dev-auth">
-          <div class="alert a-warn">
+          <div class="alert a-warn" style="margin-bottom:12px">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
             <span>Atenção: a autorização deve ser providenciada <strong>previamente pelo solicitante</strong>. A Infraestrutura da Conferência <strong>não realiza liberação de acesso.</strong></span>
+          </div>
+          <div class="row">
+            <div class="fg">
+              <label class="lbl">Quem vai abrir / acompanhar o acesso <span class="req">*</span></label>
+              <input type="text" id="f-dev-auth-acomp" class="fc" placeholder="Ex: João da portaria, segurança...">
+            </div>
+            <div class="fg">
+              <label class="lbl">Telefone do responsável <span class="req">*</span></label>
+              <input type="tel" id="f-dev-auth-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric" autocomplete="tel">
+            </div>
           </div>
         </div>
       </div>
@@ -817,11 +847,11 @@ function tipo(t) {
   document.getElementById('cond-' + t).classList.add('open');
 }
 
-function tauth(p) {
-  const tog = document.getElementById('tog-' + p + '-auth');
+function toggleAuth(p) {
+  const sel = document.getElementById('f-' + p + '-auth');
   const cond = document.getElementById('cond-' + p + '-auth');
-  tog.classList.toggle('on');
-  cond.classList.toggle('open', tog.classList.contains('on'));
+  const isSim = sel && sel.value === 'Sim';
+  cond.classList.toggle('open', isSim);
 }
 
 function tdev() {
@@ -857,6 +887,11 @@ function validar() {
     ];
     for (const [id, lbl] of flds) { if (!g(id)) { bad(id, lbl + ' é obrigatório.'); return false; } }
 
+    if (g('f-ida-auth') === 'Sim') {
+      if (!g('f-ida-auth-acomp')) { bad('f-ida-auth-acomp', 'Informe quem vai acompanhar o acesso (ida).'); return false; }
+      if (!g('f-ida-auth-tel'))   { bad('f-ida-auth-tel',   'Informe o telefone do responsável pelo acesso (ida).'); return false; }
+    }
+
     if (document.getElementById('tog-dev').classList.contains('on')) {
       const flds2 = [
         ['f-dev-dia','Dia da devolução'],['f-dev-hora','Hora da devolução'],
@@ -865,6 +900,10 @@ function validar() {
         ['f-dev-acomp','Acompanhante da devolução'],['f-dev-tel','Telefone da devolução']
       ];
       for (const [id, lbl] of flds2) { if (!g(id)) { bad(id, lbl + ' é obrigatório.'); return false; } }
+      if (g('f-dev-auth') === 'Sim') {
+        if (!g('f-dev-auth-acomp')) { bad('f-dev-auth-acomp', 'Informe quem vai acompanhar o acesso (devolução).'); return false; }
+        if (!g('f-dev-auth-tel'))   { bad('f-dev-auth-tel',   'Informe o telefone do responsável pelo acesso (devolução).'); return false; }
+      }
     }
   }
 
@@ -898,7 +937,9 @@ function coletar() {
       origem_ida: g('f-ida-origem'), destino_ida: g('f-ida-destino'),
       veiculo_ida: g('f-ida-veiculo'), desc_ida: g('f-ida-desc'),
       acomp_ida: g('f-ida-acomp'), tel_ida: g('f-ida-tel'),
-      auth_ida: document.getElementById('tog-ida-auth').classList.contains('on') ? 'Sim' : 'Não',
+      auth_ida: g('f-ida-auth') || 'Não',
+      auth_ida_acomp: g('f-ida-auth') === 'Sim' ? g('f-ida-auth-acomp') : '',
+      auth_ida_tel:   g('f-ida-auth') === 'Sim' ? g('f-ida-auth-tel')   : '',
       devolucao: document.getElementById('tog-dev').classList.contains('on') ? 'Sim' : 'Não'
     });
     if (d.devolucao === 'Sim') {
@@ -907,7 +948,9 @@ function coletar() {
         origem_dev: g('f-dev-origem'), destino_dev: g('f-dev-destino'),
         veiculo_dev: g('f-dev-veiculo'), desc_dev: g('f-dev-desc'),
         acomp_dev: g('f-dev-acomp'), tel_dev: g('f-dev-tel'),
-        auth_dev: document.getElementById('tog-dev-auth').classList.contains('on') ? 'Sim' : 'Não'
+        auth_dev: g('f-dev-auth') || 'Não',
+        auth_dev_acomp: g('f-dev-auth') === 'Sim' ? g('f-dev-auth-acomp') : '',
+        auth_dev_tel:   g('f-dev-auth') === 'Sim' ? g('f-dev-auth-tel')   : ''
       });
     }
   }
@@ -945,9 +988,14 @@ function limpar() {
     document.getElementById('tog-'+t)?.classList.remove('on');
     document.getElementById('cond-'+t)?.classList.remove('open');
   });
-  ['ida-auth','dev-auth'].forEach(a => {
-    document.getElementById('tog-'+a)?.classList.remove('on');
-    document.getElementById('cond-'+a)?.classList.remove('open');
+  ['ida','dev'].forEach(a => {
+    const sel = document.getElementById('f-'+a+'-auth');
+    if (sel) sel.value = 'Não';
+    document.getElementById('cond-'+a+'-auth')?.classList.remove('open');
+    const ac = document.getElementById('f-'+a+'-auth-acomp');
+    const tel = document.getElementById('f-'+a+'-auth-tel');
+    if (ac) ac.value = '';
+    if (tel) tel.value = '';
   });
   document.getElementById('tog-dev')?.classList.remove('on');
   document.getElementById('cond-dev')?.classList.remove('open');
@@ -1057,7 +1105,10 @@ function openDetalhe(idx) {
       <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp_ida||'-'}</div></div>
       <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel_ida||'-'}</div></div>
       <div class="di" style="grid-column:1/-1"><div class="dl">Descrição</div><div class="dv">${d.desc_ida||'-'}</div></div>
-      <div class="di"><div class="dl">Autorização</div><div class="dv">${d.auth_ida||'Não'}</div></div>
+      <div class="di"><div class="dl">Autorização de acesso</div><div class="dv">${d.auth_ida||'Não'}</div></div>
+      ${d.auth_ida==='Sim' ? `
+      <div class="di"><div class="dl">Resp. pelo acesso (ida)</div><div class="dv">${d.auth_ida_acomp||'-'}</div></div>
+      <div class="di"><div class="dl">Tel. resp. acesso (ida)</div><div class="dv">${d.auth_ida_tel||'-'}</div></div>` : ''}
     </div>`;
     if (d.devolucao==='Sim') {
       h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Devolução</div>
@@ -1068,7 +1119,10 @@ function openDetalhe(idx) {
         <div class="di"><div class="dl">Destino</div><div class="dv">${d.destino_dev||'-'}</div></div>
         <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp_dev||'-'}</div></div>
         <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel_dev||'-'}</div></div>
-        <div class="di"><div class="dl">Autorização</div><div class="dv">${d.auth_dev||'Não'}</div></div>
+        <div class="di"><div class="dl">Autorização de acesso</div><div class="dv">${d.auth_dev||'Não'}</div></div>
+        ${d.auth_dev==='Sim' ? `
+        <div class="di"><div class="dl">Resp. pelo acesso (dev.)</div><div class="dv">${d.auth_dev_acomp||'-'}</div></div>
+        <div class="di"><div class="dl">Tel. resp. acesso (dev.)</div><div class="dv">${d.auth_dev_tel||'-'}</div></div>` : ''}
       </div>`;
     }
   }
