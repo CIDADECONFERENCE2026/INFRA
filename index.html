@@ -28,13 +28,17 @@
   --r-lg: 12px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 body {
   font-family: 'Barlow', sans-serif;
   background: var(--sand);
   color: var(--dark);
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   font-size: 15px;
   line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* ── HEADER ── */
@@ -250,8 +254,20 @@ hr.sep { border:none; border-top:1px solid var(--border); margin:18px 0; }
 .fbar .fc { flex:1; min-width:180px; }
 
 /* ── TABLE ── */
-.tw { border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:var(--white); box-shadow:0 2px 8px rgba(26,26,24,0.05); }
-table { width:100%; border-collapse:collapse; font-size:13px; }
+.tw {
+  border:1px solid var(--border); border-radius:var(--r-lg);
+  overflow-x:auto; overflow-y:hidden;
+  background:var(--white); box-shadow:0 2px 8px rgba(26,26,24,0.05);
+  -webkit-overflow-scrolling:touch;
+}
+/* Indicador visual de scroll em mobile */
+.tw::after {
+  content:'';
+  position:sticky; right:0;
+  width:32px; height:100%;
+  pointer-events:none;
+}
+table { width:100%; min-width:640px; border-collapse:collapse; font-size:13px; }
 thead th {
   background:var(--dark); color:rgba(255,255,255,0.55);
   padding:11px 16px; text-align:left;
@@ -340,14 +356,15 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
 
 .ecard {
   background:var(--white); border:1px solid var(--border); border-radius:var(--r);
-  padding:16px 20px; margin-bottom:10px;
-  display:grid; grid-template-columns:1fr auto auto auto;
+  padding:14px 18px; margin-bottom:10px;
+  display:grid; grid-template-columns:1fr auto;
   gap:12px; align-items:center;
   transition:box-shadow 0.15s, border-color 0.15s;
 }
 .ecard:hover { box-shadow:0 2px 12px rgba(26,26,24,0.08); border-color:var(--gold-border); }
 .ec-name { font-weight:700; font-size:14px; margin-bottom:3px; }
 .ec-meta { font-size:12px; color:var(--muted); }
+.ecard-actions { display:flex; gap:8px; align-items:center; }
 
 /* ── TOAST ── */
 .toastwrap { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
@@ -370,12 +387,102 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
 .plan-ok   { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
 .plan-warn { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
 
-@media (max-width:640px) {
-  .row,.row3 { grid-template-columns:1fr; }
-  .dg { grid-template-columns:1fr; }
-  .ecard { grid-template-columns:1fr; }
-  .nav-tab { padding:0 11px; font-size:11px; }
-  .page { padding:28px 16px 80px; }
+/* ═══════════════════════════════
+   MOBILE FIRST
+═══════════════════════════════ */
+@media (max-width:768px) {
+  .header-inner { padding:0 16px; height:52px; }
+  .divider-v { display:none; }
+  .logo-mod { display:none; }
+  .logo { margin-right:0; }
+  .logo-top { font-size:13px; }
+  .logo-bot { font-size:8px; }
+
+  /* Bottom nav fixo */
+  .nav-tabs {
+    position:fixed; bottom:0; left:0; right:0; z-index:200;
+    background:var(--dark); border-top:1px solid rgba(255,255,255,0.1);
+    display:flex; justify-content:stretch;
+    box-shadow:0 -2px 20px rgba(0,0,0,0.35);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .nav-tab {
+    flex:1; height:54px; padding:0 4px;
+    flex-direction:column; gap:2px; font-size:10px;
+    letter-spacing:0.08em; border-bottom:none;
+    border-top:2px solid transparent;
+    justify-content:center; align-items:center;
+  }
+  .nav-tab.active { border-top-color:var(--gold2); border-bottom:none; }
+  .nav-tab .tab-icon { font-size:19px; line-height:1; display:block; }
+
+  /* Padding pra não ficar atrás do bottom nav */
+  .page { padding:20px 14px 90px; }
+
+  /* Grids coluna única */
+  .row, .row3 { grid-template-columns:1fr !important; }
+  .dg { grid-template-columns:1fr !important; }
+  .ecard { grid-template-columns:1fr !important; }
+
+  /* Cards menores */
+  .card { padding:18px 14px; border-radius:var(--r); }
+  .form-block { padding:14px 12px; }
+  .cond { padding:14px 12px; }
+  .cond-block { padding:14px 12px; }
+
+  /* Títulos */
+  .page-title { font-size:22px; }
+
+  /* Filter bar empilha verticalmente */
+  .fbar { flex-direction:column; gap:8px; }
+  .fbar .fc { min-width:unset !important; width:100% !important; flex:unset !important; }
+  .fbar select.fc { width:100% !important; min-width:unset !important; }
+  .fbar .btn { width:100%; justify-content:center; }
+
+  /* Tabela scrollável horizontalmente */
+  .tw { border-radius:var(--r); }
+  .tw { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table { min-width:580px; font-size:12px; }
+  thead th { padding:10px 12px; font-size:10px; }
+  tbody td { padding:10px 12px; }
+
+  /* Modal ocupa tela toda vindo de baixo */
+  .ov { padding:0; align-items:flex-end; }
+  .modal {
+    border-radius:var(--r-lg) var(--r-lg) 0 0;
+    max-height:90vh; padding:22px 16px 32px;
+    width:100%; max-width:100%;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  .mt { font-size:17px; }
+
+  /* Login */
+  .login-wrap { padding:20px 16px 90px; align-items:flex-start; }
+  .login-box { padding:26px 18px; }
+
+  /* Admin top */
+  .adm-top { flex-direction:column; align-items:stretch; gap:10px; }
+
+  /* Form footer empilha */
+  .form-footer { flex-direction:column-reverse; gap:10px; }
+  .form-footer .btn { width:100%; justify-content:center; }
+
+  /* ecard admin */
+  .ecard { flex-direction:column; }
+  .ecard select.fc { width:100% !important; }
+  .ecard-actions { display:flex; gap:8px; width:100%; }
+  .ecard-actions .btn { flex:1; justify-content:center; }
+
+  /* Toggle opts */
+  .tog { padding:12px 14px; }
+
+  /* Login box centralizado */
+  .login-wrap { min-height:calc(100vh - 52px); }
+}
+
+@media (max-width:380px) {
+  .nav-tab { font-size:9px; }
+  .page { padding:14px 12px 90px; }
 }
 </style>
 </head>
@@ -390,9 +497,9 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
     <div class="divider-v"></div>
     <div class="logo-mod">Infraestrutura</div>
     <nav class="nav-tabs">
-      <div class="nav-tab active" onclick="nav('solicitar',this)">Solicitar</div>
-      <div class="nav-tab" onclick="nav('consultar',this)">Consultar</div>
-      <div class="nav-tab" onclick="nav('gerenciar',this)">Gerenciar</div>
+      <div class="nav-tab active" onclick="nav('solicitar',this)"><span class="tab-icon">📋</span>Solicitar</div>
+      <div class="nav-tab" onclick="nav('consultar',this)"><span class="tab-icon">🔍</span>Consultar</div>
+      <div class="nav-tab" onclick="nav('gerenciar',this)"><span class="tab-icon">⚙️</span>Gerenciar</div>
     </nav>
   </div>
 </header>
@@ -448,7 +555,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
       </div>
       <div class="row">
         <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-ida-acomp" class="fc" placeholder="Nome do responsável"></div>
-        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-ida-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric"></div>
+        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-ida-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric" autocomplete="tel"></div>
       </div>
 
       <div class="tog" id="tog-ida-auth" onclick="tauth('ida')">
@@ -489,7 +596,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
         </div>
         <div class="row">
           <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-dev-acomp" class="fc" placeholder="Nome do responsável"></div>
-          <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-dev-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric"></div>
+          <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-dev-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric" autocomplete="tel"></div>
         </div>
         <div class="tog" id="tog-dev-auth" onclick="tauth('dev')">
           <div class="tog-lbl">O acesso ao local precisa de autorização? <span class="req">*</span></div>
@@ -524,7 +631,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
         <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-loc-acomp" class="fc" placeholder="Nome do responsável"></div>
       </div>
       <div class="row">
-        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-loc-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric"></div>
+        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-loc-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric" autocomplete="tel"></div>
         <div class="fg"></div>
       </div>
       <div class="row1">
@@ -566,7 +673,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
 
   <div class="fbar">
     <input type="text" class="fc" id="flt-txt" placeholder="Buscar por nome, área ou descrição..." oninput="fltConsulta()">
-    <select class="fc" id="flt-st" style="flex:0;min-width:160px" onchange="fltConsulta()">
+    <select class="fc" id="flt-st" style="flex:0;min-width:140px;width:auto" onchange="fltConsulta()">
       <option value="">Todos os status</option>
       <option>Aberto</option><option>Em execução</option>
       <option>Fechado</option><option>Cancelado</option>
@@ -592,6 +699,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
 <!-- MODAL -->
 <div class="ov" id="modal-ov" onclick="closeModal(event)">
   <div class="modal">
+    <div class="modal-handle" style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px;display:none" id="modal-handle"></div>
     <div class="mh">
       <div>
         <div class="mt" id="m-title">Demanda</div>
@@ -638,7 +746,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
     <div class="adm-top">
       <div class="fbar" style="margin:0;flex:1">
         <input type="text" class="fc" id="adm-flt" placeholder="Buscar..." oninput="fltAdmin()">
-        <select class="fc" id="adm-stflt" style="flex:0;min-width:160px" onchange="fltAdmin()">
+        <select class="fc" id="adm-stflt" style="flex:0;min-width:140px;width:auto" onchange="fltAdmin()">
           <option value="">Todos</option>
           <option>Aberto</option><option>Em execução</option>
           <option>Fechado</option><option>Cancelado</option>
@@ -935,6 +1043,9 @@ function openDetalhe(idx) {
   <p style="font-size:14px;background:var(--gold-lt);padding:12px;border-radius:var(--r);border-left:3px solid var(--gold);color:${d.observacoes?'var(--dark)':'var(--muted)'}">${d.observacoes||'Nenhuma observação registrada pela equipe.'}</p>`;
   document.getElementById('m-body').innerHTML = h;
   document.getElementById('modal-ov').classList.add('open');
+  // Handle de arraste no mobile
+  const handle = document.getElementById('modal-handle');
+  if (handle) handle.style.display = window.innerWidth <= 768 ? 'block' : 'none';
 }
 
 function closeModal(e) {
@@ -1055,18 +1166,23 @@ function renderAdmin(lista) {
     const tp = d.tipo==='mov'?'Movimentação':d.tipo==='loc'?'Mesmo auditório':'-';
     const st = d.status||'Aberto';
     return `<div class="ecard">
-      <div>
-        <div class="ec-name">${d.solicitante||'-'} <span style="font-weight:400;color:var(--muted)">· ${d.area||''}</span></div>
-        <div class="ec-meta"><span class="chip" style="margin-right:6px">${tp}</span>${d.timestamp||''}</div>
+      <div style="min-width:0">
+        <div class="ec-name" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          ${d.solicitante||'-'}
+          <span style="font-weight:400;color:var(--muted);font-size:13px">· ${d.area||''}</span>
+          <span class="badge ${bcls[st]||'b-aberto'}" style="margin-left:auto">${st}</span>
+        </div>
+        <div class="ec-meta" style="margin-top:4px"><span class="chip" style="margin-right:6px">${tp}</span>${d.timestamp||''}</div>
       </div>
-      <select class="fc" style="width:160px;font-size:13px" id="st-${idx}" onchange="updStatus(${idx})">
-        ${['Aberto','Em execução','Fechado','Cancelado'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
-      </select>
-      <button class="btn btn-ghost btn-sm" style="border:1px solid var(--border2)" onclick="editObs(${idx})" title="Editar observações">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-        Obs.
-      </button>
-      <span class="badge ${bcls[st]||'b-aberto'}">${st}</span>
+      <div class="ecard-actions">
+        <select class="fc" style="font-size:13px" id="st-${idx}" onchange="updStatus(${idx})">
+          ${['Aberto','Em execução','Fechado','Cancelado'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <button class="btn btn-ghost btn-sm" style="border:1px solid var(--border2);flex-shrink:0" onclick="editObs(${idx})" title="Editar observações">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          Obs.
+        </button>
+      </div>
     </div>`;
   }).join('');
 }
