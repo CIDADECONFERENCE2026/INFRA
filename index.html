@@ -245,9 +245,22 @@ hr.sep { border:none; border-top:1px solid var(--border); margin:18px 0; }
 }
 .badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
 .b-aberto    { background:#F3F4F6; color:#6B7280; border:1px solid #E5E7EB; }
+.b-aceito    { background:#EDE9FE; color:#5B21B6; border:1px solid #C4B5FD; }
 .b-exec      { background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; }
 .b-fechado   { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
 .b-cancelado { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
+
+/* Botão aceitar */
+.btn-aceitar {
+  background: #5B21B6; color: white;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+  padding:7px 14px; border-radius:var(--r); border:none; cursor:pointer;
+  display:inline-flex; align-items:center; gap:5px;
+  transition:background 0.15s; white-space:nowrap; flex-shrink:0;
+}
+.btn-aceitar:hover { background:#4C1D95; }
+.btn-aceitar:disabled { background:var(--sand3); color:var(--muted2); cursor:not-allowed; }
 
 /* ── FILTER BAR ── */
 .fbar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
@@ -256,18 +269,12 @@ hr.sep { border:none; border-top:1px solid var(--border); margin:18px 0; }
 /* ── TABLE ── */
 .tw {
   border:1px solid var(--border); border-radius:var(--r-lg);
-  overflow-x:auto; overflow-y:hidden;
+  overflow-x:auto; overflow-y:visible;
   background:var(--white); box-shadow:0 2px 8px rgba(26,26,24,0.05);
   -webkit-overflow-scrolling:touch;
+  position:relative;
 }
-/* Indicador visual de scroll em mobile */
-.tw::after {
-  content:'';
-  position:sticky; right:0;
-  width:32px; height:100%;
-  pointer-events:none;
-}
-table { width:100%; min-width:640px; border-collapse:collapse; font-size:13px; }
+table { width:100%; min-width:780px; border-collapse:collapse; font-size:13px; table-layout:auto; }
 thead th {
   background:var(--dark); color:rgba(255,255,255,0.55);
   padding:11px 16px; text-align:left;
@@ -442,7 +449,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
   /* Tabela scrollável horizontalmente */
   .tw { border-radius:var(--r); }
   .tw { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  table { min-width:580px; font-size:12px; }
+  table { min-width:780px; font-size:12px; }
   thead th { padding:10px 12px; font-size:10px; }
   tbody td { padding:10px 12px; }
 
@@ -675,7 +682,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
     <input type="text" class="fc" id="flt-txt" placeholder="Buscar por nome, área ou descrição..." oninput="fltConsulta()">
     <select class="fc" id="flt-st" style="flex:0;min-width:140px;width:auto" onchange="fltConsulta()">
       <option value="">Todos os status</option>
-      <option>Aberto</option><option>Em execução</option>
+      <option>Aceito - Time Infra</option><option>Em execução</option>
       <option>Fechado</option><option>Cancelado</option>
     </select>
     <button class="btn btn-outline btn-sm" onclick="loadConsulta()">
@@ -748,8 +755,8 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
         <input type="text" class="fc" id="adm-flt" placeholder="Buscar..." oninput="fltAdmin()">
         <select class="fc" id="adm-stflt" style="flex:0;min-width:140px;width:auto" onchange="fltAdmin()">
           <option value="">Todos</option>
-          <option>Aberto</option><option>Em execução</option>
-          <option>Fechado</option><option>Cancelado</option>
+          <option>Aberto</option><option>Aceito - Time Infra</option>
+          <option>Em execução</option><option>Fechado</option><option>Cancelado</option>
         </select>
         <button class="btn btn-outline btn-sm" onclick="loadAdmin()">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a8 8 0 0114.93-2M20 15a8 8 0 01-14.93 2"/></svg>
@@ -875,7 +882,15 @@ function validar() {
 function coletar() {
   const d = {
     solicitante: g('f-nome'), area: g('f-area'), tipo: tipoAtivo,
-    timestamp: new Date().toLocaleString('pt-BR'), status: 'Aberto', observacoes: ''
+    timestamp: (() => {
+      const n = new Date();
+      const d = String(n.getDate()).padStart(2,'0');
+      const m = String(n.getMonth()+1).padStart(2,'0');
+      const y = n.getFullYear();
+      const h = String(n.getHours()).padStart(2,'0');
+      const mi = String(n.getMinutes()).padStart(2,'0');
+      return d+'/'+m+'/'+y+' '+h+':'+mi;
+    })(), status: 'Aberto', observacoes: ''
   };
   if (tipoAtivo === 'mov') {
     Object.assign(d, {
@@ -943,7 +958,7 @@ function limpar() {
 // CONSULTA
 // ══════════════════════════════════════════
 let dadosCons = [];
-const bcls = { 'Aberto':'b-aberto','Em execução':'b-exec','Fechado':'b-fechado','Cancelado':'b-cancelado' };
+const bcls = { 'Aberto':'b-aberto','Aceito - Time Infra':'b-aceito','Em execução':'b-exec','Fechado':'b-fechado','Cancelado':'b-cancelado' };
 
 async function loadConsulta() {
   const tb = document.getElementById('tbody-consulta');
@@ -956,13 +971,40 @@ async function loadConsulta() {
   } catch { tb.innerHTML = '<tr><td colspan="8"><div class="load-row" style="color:#991B1B">Erro ao carregar. Verifique a URL do Apps Script.</div></td></tr>'; }
 }
 
+// Status visíveis na tela pública (só depois de aceito pelo time infra)
+const STATUS_VISIVEIS = ['Aceito - Time Infra','Em execução','Fechado','Cancelado'];
+
 function fltConsulta() {
   const txt = document.getElementById('flt-txt').value.toLowerCase();
   const st  = document.getElementById('flt-st').value;
-  renderConsulta(dadosCons.filter(d =>
-    (!txt || [d.solicitante,d.area,d.desc_ida,d.descricao].some(x=>(x||'').toLowerCase().includes(txt))) &&
-    (!st || d.status===st)
-  ));
+  renderConsulta(dadosCons.filter(d => {
+    // Só exibe se foi aceito pelo time infra
+    if (!STATUS_VISIVEIS.includes(d.status)) return false;
+    const matchTxt = !txt || [d.solicitante,d.area,d.desc_ida,d.descricao].some(x=>(x||'').toLowerCase().includes(txt));
+    const matchSt  = !st || d.status===st;
+    return matchTxt && matchSt;
+  }));
+}
+
+// Formata qualquer formato de timestamp para dd/mm/yyyy hh:mm
+function formatarTs(ts) {
+  if (!ts) return '-';
+  // Já está no formato certo: dd/mm/yyyy hh:mm
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(ts)) return ts.substring(0,16);
+  // Formato JS longo (Tue May 12 2026 18:22:45 GMT...)
+  try {
+    const d = new Date(ts);
+    if (!isNaN(d)) {
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mi = String(d.getMinutes()).padStart(2,'0');
+      return dd+'/'+mm+'/'+yy+' '+hh+':'+mi;
+    }
+  } catch(e){}
+  // Fallback: retorna original mas curto
+  return ts.length > 16 ? ts.substring(0,16) : ts;
 }
 
 function renderConsulta(lista) {
@@ -978,9 +1020,10 @@ function renderConsulta(lista) {
     const st = d.status||'Aberto';
     const idx = dadosCons.indexOf(d);
     const plan = calcPlanejamento(d);
+    const tsFormatado = formatarTs(d.timestamp);
     return `<tr onclick="openDetalhe(${idx})">
-      <td class="td-mono">${d.id||(i+1)}</td>
-      <td class="td-mono" style="white-space:nowrap">${d.timestamp||'-'}</td>
+      <td class="td-mono" style="font-size:11px">${d.id||(i+1)}</td>
+      <td class="td-mono" style="white-space:nowrap;font-size:12px">${tsFormatado}</td>
       <td style="font-weight:600">${d.solicitante||'-'}</td>
       <td style="color:var(--muted)">${d.area||'-'}</td>
       <td><span class="chip">${tp}</span></td>
@@ -996,7 +1039,7 @@ function openDetalhe(idx) {
   const st = d.status||'Aberto';
   const plan = calcPlanejamento(d);
   document.getElementById('m-title').textContent = 'Solicitação — ' + (d.solicitante||'');
-  document.getElementById('m-id').textContent = 'Protocolo ' + (d.id||(idx+1)) + '  ·  ' + (d.timestamp||'');
+  document.getElementById('m-id').textContent = 'Protocolo ' + (d.id||(idx+1)) + '  ·  ' + formatarTs(d.timestamp);
   let h = `<div class="dg">
     <div class="di"><div class="dl">Solicitante</div><div class="dv">${d.solicitante||'-'}</div></div>
     <div class="di"><div class="dl">Área</div><div class="dv">${d.area||'-'}</div></div>
@@ -1170,21 +1213,44 @@ function renderAdmin(lista) {
         <div class="ec-name" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           ${d.solicitante||'-'}
           <span style="font-weight:400;color:var(--muted);font-size:13px">· ${d.area||''}</span>
-          <span class="badge ${bcls[st]||'b-aberto'}" style="margin-left:auto">${st}</span>
+          <span class="badge ${bcls[st]||'b-aberto'}" style="margin-left:auto">${st==='Aberto'?'⏳ Aguardando Aceite':st}</span>
         </div>
-        <div class="ec-meta" style="margin-top:4px"><span class="chip" style="margin-right:6px">${tp}</span>${d.timestamp||''}</div>
+        <div class="ec-meta" style="margin-top:4px"><span class="chip" style="margin-right:6px">${tp}</span>${formatarTs(d.timestamp)}</div>
       </div>
       <div class="ecard-actions">
-        <select class="fc" style="font-size:13px" id="st-${idx}" onchange="updStatus(${idx})">
-          ${['Aberto','Em execução','Fechado','Cancelado'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-        <button class="btn btn-ghost btn-sm" style="border:1px solid var(--border2);flex-shrink:0" onclick="editObs(${idx})" title="Editar observações">
+        ${st === 'Aberto' ? `
+          <button class="btn-aceitar" onclick="aceitarDemanda(${idx})">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Aceitar
+          </button>
+        ` : `
+          <select class="fc" style="font-size:13px" id="st-${idx}" onchange="updStatus(${idx})">
+            ${['Aceito - Time Infra','Em execução','Fechado','Cancelado'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        `}
+        <button class="btn btn-ghost btn-sm" style="border:1px solid var(--border2);flex-shrink:0" onclick="editObs(${idx})" title="Observações">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
           Obs.
         </button>
       </div>
     </div>`;
   }).join('');
+}
+
+async function aceitarDemanda(idx) {
+  const d = dadosAdm[idx];
+  if (!confirm('Confirmar aceite da demanda de ' + (d.solicitante||'') + '?\nEla ficará visível na tela de Consulta.')) return;
+  d.status = 'Aceito - Time Infra';
+  try {
+    const r = await fetch(API, {
+      method: 'POST', cache: 'no-store',
+      body: JSON.stringify({ acao:'atualizar', id:d.id, status:'Aceito - Time Infra', observacoes:d.observacoes||'', token: sessaoToken })
+    });
+    const j = await r.json();
+    if (j.expirado) { sessaoExpirada(); return; }
+    toast('Demanda aceita! Agora visível na consulta.', 'ok');
+    fltAdmin();
+  } catch { toast('Erro ao aceitar. Tente novamente.', 'err'); }
 }
 
 async function updStatus(idx) {
@@ -1248,9 +1314,15 @@ function calcPlanejamento(d) {
   // timestamp formato: dd/mm/yyyy, hh:mm:ss ou similar
   let solicitadoEm = null;
   try {
-    // tenta parse dd/mm/yyyy, HH:MM:SS
-    const m = tsStr.match(/(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{2}):(\d{2})/);
-    if (m) solicitadoEm = new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]);
+    // tenta parse dd/mm/yyyy HH:MM
+    const m = tsStr.match(/(\d{2})\/(\d{2})\/(\d{4})[,\s]+(\d{2}):(\d{2})/);
+    if (m) {
+      solicitadoEm = new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]);
+    } else {
+      // tenta parse JS nativo (Tue May 12 2026...)
+      const d2 = new Date(tsStr);
+      if (!isNaN(d2)) solicitadoEm = d2;
+    }
   } catch(e){}
 
   // Data da atividade
