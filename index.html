@@ -360,6 +360,16 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
 .t-err { background:#991B1B; color:#fff; }
 .t-inf { background:var(--dark); color:#fff; }
 
+/* ── PLANEJAMENTO BADGE ── */
+.plan-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 8px; border-radius:20px;
+  font-family:'Barlow Condensed',sans-serif; font-size:10px;
+  font-weight:700; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap;
+}
+.plan-ok   { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
+.plan-warn { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
+
 @media (max-width:640px) {
   .row,.row3 { grid-template-columns:1fr; }
   .dg { grid-template-columns:1fr; }
@@ -438,7 +448,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
       </div>
       <div class="row">
         <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-ida-acomp" class="fc" placeholder="Nome do responsável"></div>
-        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-ida-tel" class="fc" placeholder="(xx) xxxxx-xxxx"></div>
+        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-ida-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric"></div>
       </div>
 
       <div class="tog" id="tog-ida-auth" onclick="tauth('ida')">
@@ -479,7 +489,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
         </div>
         <div class="row">
           <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-dev-acomp" class="fc" placeholder="Nome do responsável"></div>
-          <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-dev-tel" class="fc" placeholder="(xx) xxxxx-xxxx"></div>
+          <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-dev-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric"></div>
         </div>
         <div class="tog" id="tog-dev-auth" onclick="tauth('dev')">
           <div class="tog-lbl">O acesso ao local precisa de autorização? <span class="req">*</span></div>
@@ -514,7 +524,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
         <div class="fg"><label class="lbl">Quem vai acompanhar <span class="req">*</span></label><input type="text" id="f-loc-acomp" class="fc" placeholder="Nome do responsável"></div>
       </div>
       <div class="row">
-        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-loc-tel" class="fc" placeholder="(xx) xxxxx-xxxx"></div>
+        <div class="fg"><label class="lbl">Telefone <span class="req">*</span></label><input type="tel" id="f-loc-tel" class="fc tel-mask" placeholder="(xx) xxxxx-xxxx" oninput="maskTel(this)" maxlength="15" inputmode="numeric"></div>
         <div class="fg"></div>
       </div>
       <div class="row1">
@@ -570,10 +580,10 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
   <div class="tw">
     <table>
       <thead>
-        <tr><th>#</th><th>Data / Hora</th><th>Solicitante</th><th>Área</th><th>Tipo</th><th>Descrição</th><th>Status</th></tr>
+        <tr><th>#</th><th>Data / Hora</th><th>Solicitante</th><th>Área</th><th>Tipo</th><th>Descrição</th><th>Planejamento</th><th>Status</th></tr>
       </thead>
       <tbody id="tbody-consulta">
-        <tr><td colspan="7"><div class="load-row">Carregando<span class="dots"></span></div></td></tr>
+        <tr><td colspan="8"><div class="load-row">Carregando<span class="dots"></span></div></td></tr>
       </tbody>
     </table>
   </div>
@@ -831,13 +841,13 @@ const bcls = { 'Aberto':'b-aberto','Em execução':'b-exec','Fechado':'b-fechado
 
 async function loadConsulta() {
   const tb = document.getElementById('tbody-consulta');
-  tb.innerHTML = '<tr><td colspan="7"><div class="load-row">Carregando<span class="dots"></span></div></td></tr>';
+  tb.innerHTML = '<tr><td colspan="8"><div class="load-row">Carregando<span class="dots"></span></div></td></tr>';
   try {
     const r = await fetch(API + '?acao=listar');
     const j = await r.json();
     dadosCons = j.dados || [];
     fltConsulta();
-  } catch { tb.innerHTML = '<tr><td colspan="7"><div class="load-row" style="color:#991B1B">Erro ao carregar. Verifique a URL do Apps Script.</div></td></tr>'; }
+  } catch { tb.innerHTML = '<tr><td colspan="8"><div class="load-row" style="color:#991B1B">Erro ao carregar. Verifique a URL do Apps Script.</div></td></tr>'; }
 }
 
 function fltConsulta() {
@@ -852,7 +862,7 @@ function fltConsulta() {
 function renderConsulta(lista) {
   const tb = document.getElementById('tbody-consulta');
   if (!lista.length) {
-    tb.innerHTML = `<tr><td colspan="7"><div class="empty">
+    tb.innerHTML = `<tr><td colspan="8"><div class="empty">
       <svg width="38" height="38" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
       <p>Nenhuma demanda encontrada.</p></div></td></tr>`;
     return;
@@ -861,6 +871,7 @@ function renderConsulta(lista) {
     const tp = d.tipo==='mov'?'Movimentação':d.tipo==='loc'?'Mesmo auditório':'-';
     const st = d.status||'Aberto';
     const idx = dadosCons.indexOf(d);
+    const plan = calcPlanejamento(d);
     return `<tr onclick="openDetalhe(${idx})">
       <td class="td-mono">${d.id||(i+1)}</td>
       <td class="td-mono" style="white-space:nowrap">${d.timestamp||'-'}</td>
@@ -868,6 +879,7 @@ function renderConsulta(lista) {
       <td style="color:var(--muted)">${d.area||'-'}</td>
       <td><span class="chip">${tp}</span></td>
       <td class="td-desc">${d.desc_ida||d.descricao||'-'}</td>
+      <td>${plan.badge}</td>
       <td><span class="badge ${bcls[st]||'b-aberto'}">${st}</span></td>
     </tr>`;
   }).join('');
@@ -876,6 +888,7 @@ function renderConsulta(lista) {
 function openDetalhe(idx) {
   const d = dadosCons[idx];
   const st = d.status||'Aberto';
+  const plan = calcPlanejamento(d);
   document.getElementById('m-title').textContent = 'Solicitação — ' + (d.solicitante||'');
   document.getElementById('m-id').textContent = 'Protocolo ' + (d.id||(idx+1)) + '  ·  ' + (d.timestamp||'');
   let h = `<div class="dg">
@@ -883,6 +896,7 @@ function openDetalhe(idx) {
     <div class="di"><div class="dl">Área</div><div class="dv">${d.area||'-'}</div></div>
     <div class="di"><div class="dl">Tipo</div><div class="dv">${d.tipo==='mov'?'Movimentação entre locais':d.tipo==='loc'?'Mesmo auditório':'-'}</div></div>
     <div class="di"><div class="dl">Status</div><div class="dv"><span class="badge ${bcls[st]||'b-aberto'}">${st}</span></div></div>
+    <div class="di" style="grid-column:1/-1"><div class="dl">Planejamento</div><div class="dv" style="display:flex;align-items:center;gap:8px">${plan.badge}<span style="font-size:12px;color:var(--muted)">${plan.info}</span></div></div>
   </div>`;
   if (d.tipo==='mov') {
     h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Ida</div>
@@ -919,10 +933,8 @@ function openDetalhe(idx) {
       <div class="di" style="grid-column:1/-1"><div class="dl">Descrição</div><div class="dv">${d.descricao||'-'}</div></div>
     </div>`;
   }
-  if (d.observacoes) {
-    h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Observações da equipe</div>
-    <p style="font-size:14px;background:var(--gold-lt);padding:12px;border-radius:var(--r);border-left:3px solid var(--gold);color:var(--dark)">${d.observacoes}</p>`;
-  }
+  h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Observações da equipe</div>
+  <p style="font-size:14px;background:var(--gold-lt);padding:12px;border-radius:var(--r);border-left:3px solid var(--gold);color:${d.observacoes?'var(--dark)':'var(--muted)'}">${d.observacoes||'Nenhuma observação registrada pela equipe.'}</p>`;
   document.getElementById('m-body').innerHTML = h;
   document.getElementById('modal-ov').classList.add('open');
 }
@@ -1025,6 +1037,69 @@ function editObs(idx) {
   fetch(API, { method:'POST', body: JSON.stringify({ acao:'atualizar', id:d.id, status:d.status, observacoes:obs }) })
     .then(() => toast('Observações salvas.', 'ok'))
     .catch(() => toast('Erro ao salvar.', 'err'));
+}
+
+// ══════════════════════════════════════════
+// MÁSCARA TELEFONE
+// ══════════════════════════════════════════
+function maskTel(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length <= 10) {
+    v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, (_, a, b, c) => c ? `(${a}) ${b}-${c}` : b ? `(${a}) ${b}` : a ? `(${a}` : '');
+  } else {
+    v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, (_, a, b, c) => c ? `(${a}) ${b}-${c}` : b ? `(${a}) ${b}` : a ? `(${a}` : '');
+  }
+  el.value = v;
+}
+
+// ══════════════════════════════════════════
+// PLANEJAMENTO — calcula antecedência
+// ══════════════════════════════════════════
+function calcPlanejamento(d) {
+  // Pega a data/hora da solicitação e da atividade
+  const tsStr = d.timestamp || '';
+  // timestamp formato: dd/mm/yyyy, hh:mm:ss ou similar
+  let solicitadoEm = null;
+  try {
+    // tenta parse dd/mm/yyyy, HH:MM:SS
+    const m = tsStr.match(/(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{2}):(\d{2})/);
+    if (m) solicitadoEm = new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]);
+  } catch(e){}
+
+  // Data da atividade
+  let diaAtiv = d.dia_ida || d.dia || '';
+  let horaAtiv = d.hora_ida || d.hora || '';
+  let atividadeEm = null;
+  if (diaAtiv && horaAtiv) {
+    try {
+      atividadeEm = new Date(diaAtiv + 'T' + horaAtiv);
+    } catch(e){}
+  }
+
+  if (!solicitadoEm || !atividadeEm || isNaN(solicitadoEm) || isNaN(atividadeEm)) {
+    return { badge: '<span class="plan-badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB">Sem data</span>', info: '' };
+  }
+
+  const diffHoras = (atividadeEm - solicitadoEm) / (1000 * 60 * 60);
+  if (diffHoras >= 8) {
+    const h = Math.floor(diffHoras);
+    return {
+      badge: '<span class="plan-badge plan-ok">✓ Planejado com antecedência</span>',
+      info: `${h}h de antecedência`
+    };
+  } else if (diffHoras > 0) {
+    const h = Math.floor(diffHoras);
+    const min = Math.floor((diffHoras - h) * 60);
+    return {
+      badge: '<span class="plan-badge plan-warn">⚠ Sem planejamento</span>',
+      info: `apenas ${h > 0 ? h + 'h ' : ''}${min}min de antecedência`
+    };
+  } else {
+    return {
+      badge: '<span class="plan-badge plan-warn">⚠ Sem planejamento</span>',
+      info: 'solicitado após o horário da atividade'
+    };
+  }
 }
 
 // ══════════════════════════════════════════
