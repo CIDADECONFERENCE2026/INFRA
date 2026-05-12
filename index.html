@@ -619,9 +619,9 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
       <div class="fg" style="margin-bottom:18px"><label class="lbl">Senha</label>
         <input type="password" id="l-senha" class="fc" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
       </div>
-      <div id="l-erro" style="display:none" class="alert a-err">
+      <div id="l-erro" style="display:none;margin-bottom:12px" class="alert a-err">
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M15 9l-6 6M9 9l6 6"/></svg>
-        Credenciais inválidas.
+        <span>Credenciais inválidas.</span>
       </div>
       <button class="btn btn-gold" style="width:100%;margin-top:6px" onclick="login()">
         <span id="l-btxt">Entrar</span>
@@ -667,9 +667,7 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
 // CONFIG
 // ══════════════════════════════════════════
 const API = 'https://script.google.com/macros/s/AKfycbzwaN1UEpSYKYKQ_XK9nbayYXia9Dk1FSTW0tYyfhLh7mk0RAKapTNKplB3SHokTLtkKA/exec';
-const USERS = {
-  'ernane.novale@gmail.com': 'Conference2026'
-};
+// Sem credenciais no cliente — autenticação é feita no servidor (Apps Script)
 
 // ══════════════════════════════════════════
 // NAV
@@ -808,7 +806,7 @@ async function enviar() {
   const sp  = document.getElementById('sp-env');
   btn.disabled = true; txt.textContent = 'Enviando...'; sp.style.display = 'block';
   try {
-    const r = await fetch(API, { method:'POST', body: JSON.stringify({ acao:'criar', dados }) });
+    const r = await fetch(API, { method:'POST', cache:'no-store', body: JSON.stringify({ acao:'criar', dados }) });
     const j = await r.json();
     if (j.ok) { toast('Solicitação enviada! Protocolo: ' + j.id, 'ok'); limpar(); }
     else throw new Error(j.erro);
@@ -843,7 +841,7 @@ async function loadConsulta() {
   const tb = document.getElementById('tbody-consulta');
   tb.innerHTML = '<tr><td colspan="8"><div class="load-row">Carregando<span class="dots"></span></div></td></tr>';
   try {
-    const r = await fetch(API + '?acao=listar');
+    const r = await fetch(API + '?acao=listar&_=' + Date.now(), { cache: 'no-store' });
     const j = await r.json();
     dadosCons = j.dados || [];
     fltConsulta();
@@ -945,30 +943,84 @@ function closeModal(e) {
 }
 
 // ══════════════════════════════════════════
-// AUTH
+// AUTH — token gerenciado no servidor
 // ══════════════════════════════════════════
 let logado = false;
+let sessaoToken = null;
+let sessaoEmail = null;
 
-function login() {
+// Ao carregar a página, verifica se há sessão anterior e a descarta (sem cache)
+window.addEventListener('load', () => {
+  limparSessao(false); // sempre começa sem sessão
+});
+
+function limparSessao(notificarServidor = true) {
+  if (notificarServidor && sessaoToken) {
+    // Invalida o token no servidor (fire-and-forget)
+    fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({ acao: 'logout', token: sessaoToken }),
+      cache: 'no-store'
+    }).catch(() => {});
+  }
+  sessaoToken = null;
+  sessaoEmail = null;
+  logado = false;
+}
+
+async function login() {
   const em = document.getElementById('l-email').value.trim().toLowerCase();
   const pw = document.getElementById('l-senha').value;
   const er = document.getElementById('l-erro');
-  if (USERS[em] && USERS[em] === pw) {
-    logado = true; er.style.display = 'none';
-    document.getElementById('login-wrap').style.display = 'none';
-    document.getElementById('adm-panel').classList.add('on');
-    document.getElementById('adm-nome').textContent = em;
-    loadAdmin();
-  } else { er.style.display = 'flex'; }
+  const btn = document.getElementById('l-btxt');
+  const sp  = document.getElementById('sp-login');
+
+  er.style.display = 'none';
+  btn.textContent = 'Verificando...';
+  sp.style.display = 'block';
+
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      body: JSON.stringify({ acao: 'login', email: em, senha: pw }),
+      cache: 'no-store'
+    });
+    const j = await r.json();
+
+    if (j.ok && j.token) {
+      sessaoToken = j.token;
+      sessaoEmail = j.email || em;
+      logado = true;
+      er.style.display = 'none';
+      document.getElementById('login-wrap').style.display = 'none';
+      document.getElementById('adm-panel').classList.add('on');
+      document.getElementById('adm-nome').textContent = sessaoEmail;
+      loadAdmin();
+    } else {
+      er.style.display = 'flex';
+      document.getElementById('l-senha').value = '';
+      document.getElementById('l-senha').focus();
+    }
+  } catch (e) {
+    er.style.display = 'flex';
+    er.querySelector('span') && (er.querySelector('span').textContent = 'Erro de conexão. Tente novamente.');
+  } finally {
+    btn.textContent = 'Entrar';
+    sp.style.display = 'none';
+  }
 }
 
 function logout() {
-  logado = false;
+  limparSessao(true);
   document.getElementById('login-wrap').style.display = 'flex';
   document.getElementById('adm-panel').classList.remove('on');
   document.getElementById('l-email').value = '';
   document.getElementById('l-senha').value = '';
   document.getElementById('l-erro').style.display = 'none';
+  // Limpa dados em memória
+  dadosAdm = [];
+  document.getElementById('adm-lista').innerHTML = '<div class="load-row">Faça login para carregar.</div>';
+  toast('Sessão encerrada com segurança.', 'inf');
 }
 
 // ══════════════════════════════════════════
@@ -979,7 +1031,7 @@ let dadosAdm = [];
 async function loadAdmin() {
   document.getElementById('adm-lista').innerHTML = '<div class="load-row">Carregando<span class="dots"></span></div>';
   try {
-    const r = await fetch(API + '?acao=listar');
+    const r = await fetch(API + '?acao=listar&_=' + Date.now(), { cache: 'no-store' });
     const j = await r.json();
     dadosAdm = j.dados || [];
     fltAdmin();
@@ -1023,7 +1075,13 @@ async function updStatus(idx) {
   const d = dadosAdm[idx];
   d.status = document.getElementById('st-' + idx).value;
   try {
-    await fetch(API, { method:'POST', body: JSON.stringify({ acao:'atualizar', id:d.id, status:d.status, observacoes:d.observacoes||'' }) });
+    const r = await fetch(API, {
+      method: 'POST',
+      cache: 'no-store',
+      body: JSON.stringify({ acao:'atualizar', id:d.id, status:d.status, observacoes:d.observacoes||'', token: sessaoToken })
+    });
+    const j = await r.json();
+    if (j.expirado) { sessaoExpirada(); return; }
     toast('Status atualizado para "' + d.status + '"', 'ok');
     fltAdmin();
   } catch { toast('Erro ao atualizar.', 'err'); }
@@ -1034,9 +1092,22 @@ function editObs(idx) {
   const obs = prompt('Observações da equipe:', d.observacoes||'');
   if (obs===null) return;
   d.observacoes = obs;
-  fetch(API, { method:'POST', body: JSON.stringify({ acao:'atualizar', id:d.id, status:d.status, observacoes:obs }) })
-    .then(() => toast('Observações salvas.', 'ok'))
+  fetch(API, {
+    method: 'POST',
+    cache: 'no-store',
+    body: JSON.stringify({ acao:'atualizar', id:d.id, status:d.status, observacoes:obs, token: sessaoToken })
+  })
+    .then(r => r.json())
+    .then(j => { if (j.expirado) { sessaoExpirada(); return; } toast('Observações salvas.', 'ok'); })
     .catch(() => toast('Erro ao salvar.', 'err'));
+}
+
+function sessaoExpirada() {
+  limparSessao(false);
+  document.getElementById('login-wrap').style.display = 'flex';
+  document.getElementById('adm-panel').classList.remove('on');
+  dadosAdm = [];
+  toast('Sessão expirada. Faça login novamente.', 'err');
 }
 
 // ══════════════════════════════════════════
