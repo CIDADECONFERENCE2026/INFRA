@@ -1098,7 +1098,8 @@ function openDetalhe(idx) {
   if (d.tipo==='mov') {
     h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Ida</div>
     <div class="dg">
-      <div class="di"><div class="dl">Data / Hora</div><div class="dv">${d.dia_ida||'-'} ${d.hora_ida||''}</div></div>
+      <div class="di"><div class="dl">Data</div><div class="dv">${fmtData(d.dia_ida)}</div></div>
+      <div class="di"><div class="dl">Hora</div><div class="dv">${fmtHora(d.hora_ida)}</div></div>
       <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo_ida||'-'}</div></div>
       <div class="di"><div class="dl">Origem</div><div class="dv">${d.origem_ida||'-'}</div></div>
       <div class="di"><div class="dl">Destino</div><div class="dv">${d.destino_ida||'-'}</div></div>
@@ -1113,7 +1114,8 @@ function openDetalhe(idx) {
     if (d.devolucao==='Sim') {
       h += `<hr class="sep"><div class="sec-title" style="font-size:11px;margin-bottom:10px">Devolução</div>
       <div class="dg">
-        <div class="di"><div class="dl">Data / Hora</div><div class="dv">${d.dia_dev||'-'} ${d.hora_dev||''}</div></div>
+        <div class="di"><div class="dl">Data</div><div class="dv">${fmtData(d.dia_dev)}</div></div>
+        <div class="di"><div class="dl">Hora</div><div class="dv">${fmtHora(d.hora_dev)}</div></div>
         <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo_dev||'-'}</div></div>
         <div class="di"><div class="dl">Origem</div><div class="dv">${d.origem_dev||'-'}</div></div>
         <div class="di"><div class="dl">Destino</div><div class="dv">${d.destino_dev||'-'}</div></div>
@@ -1128,7 +1130,8 @@ function openDetalhe(idx) {
   }
   if (d.tipo==='loc') {
     h += `<hr class="sep"><div class="dg">
-      <div class="di"><div class="dl">Data / Hora</div><div class="dv">${d.dia||'-'} ${d.hora||''}</div></div>
+      <div class="di"><div class="dl">Data</div><div class="dv">${fmtData(d.dia)}</div></div>
+      <div class="di"><div class="dl">Hora</div><div class="dv">${fmtHora(d.hora)}</div></div>
       <div class="di"><div class="dl">Local</div><div class="dv">${d.local||'-'}</div></div>
       <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo||'-'}</div></div>
       <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp||'-'}</div></div>
@@ -1362,6 +1365,43 @@ function maskTel(el) {
 // ══════════════════════════════════════════
 // PLANEJAMENTO — calcula antecedência
 // ══════════════════════════════════════════
+// Converte yyyy-mm-dd → dd/mm/aaaa
+function fmtData(val) {
+  if (!val || val === '-') return '-';
+  // já está no formato dd/mm/aaaa
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(val.trim())) return val.trim();
+  // formato yyyy-mm-dd (vindo do input date)
+  const m = String(val).match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return m[3] + '/' + m[2] + '/' + m[1];
+  // formato JS longo (Thu Jun 04 2026...)
+  try {
+    const dt = new Date(val);
+    if (!isNaN(dt)) {
+      return String(dt.getDate()).padStart(2,'0') + '/' +
+             String(dt.getMonth()+1).padStart(2,'0') + '/' + dt.getFullYear();
+    }
+  } catch(e){}
+  return val;
+}
+
+// Extrai hora hh:mm de qualquer formato
+function fmtHora(val) {
+  if (!val || val === '-') return '-';
+  // já está no formato hh:mm
+  if (/^\d{2}:\d{2}$/.test(String(val).trim())) return String(val).trim();
+  // formato JS longo contém horário
+  try {
+    const dt = new Date(val);
+    if (!isNaN(dt)) {
+      return String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
+    }
+  } catch(e){}
+  // Tenta extrair hh:mm de string
+  const m = String(val).match(/(\d{2}):(\d{2})/);
+  if (m) return m[1] + ':' + m[2];
+  return val;
+}
+
 function calcPlanejamento(d) {
   // Pega a data/hora da solicitação e da atividade
   const tsStr = d.timestamp || '';
@@ -1379,13 +1419,39 @@ function calcPlanejamento(d) {
     }
   } catch(e){}
 
-  // Data da atividade
+  // Data da atividade — suporta yyyy-mm-dd (input), dd/mm/aaaa e formato JS longo
   let diaAtiv = d.dia_ida || d.dia || '';
   let horaAtiv = d.hora_ida || d.hora || '';
   let atividadeEm = null;
-  if (diaAtiv && horaAtiv) {
+  if (diaAtiv) {
     try {
-      atividadeEm = new Date(diaAtiv + 'T' + horaAtiv);
+      let dStr = String(diaAtiv);
+      let hStr = String(horaAtiv || '00:00');
+      // yyyy-mm-dd direto para new Date
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dStr)) {
+        atividadeEm = new Date(dStr + 'T' + hStr);
+      }
+      // dd/mm/aaaa → converter
+      else if (/^\d{2}\/\d{2}\/\d{4}$/.test(dStr)) {
+        const p = dStr.split('/');
+        atividadeEm = new Date(+p[2], +p[1]-1, +p[0],
+          +hStr.split(':')[0], +hStr.split(':')[1] || 0);
+      }
+      // Formato longo do Sheets (Thu Jun 04 2026 00:00:00 GMT...)
+      else {
+        const dt = new Date(dStr);
+        if (!isNaN(dt)) {
+          // Combina data do dt com hora separada
+          const hParts = hStr.match(/(\d{2}):(\d{2})/);
+          if (hParts) dt.setHours(+hParts[1], +hParts[2], 0, 0);
+          // Se hora tbm é longo, pega do próprio dt
+          else if (String(horaAtiv).length > 5) {
+            const ht = new Date(String(horaAtiv));
+            if (!isNaN(ht)) dt.setHours(ht.getHours(), ht.getMinutes(), 0, 0);
+          }
+          atividadeEm = dt;
+        }
+      }
     } catch(e){}
   }
 
