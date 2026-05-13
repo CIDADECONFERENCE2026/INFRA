@@ -363,15 +363,38 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
 
 .ecard {
   background:var(--white); border:1px solid var(--border); border-radius:var(--r);
-  padding:14px 18px; margin-bottom:10px;
-  display:grid; grid-template-columns:1fr auto;
-  gap:12px; align-items:center;
+  margin-bottom:10px;
   transition:box-shadow 0.15s, border-color 0.15s;
+  overflow:hidden;
 }
 .ecard:hover { box-shadow:0 2px 12px rgba(26,26,24,0.08); border-color:var(--gold-border); }
+.ecard-header {
+  padding:14px 18px;
+  display:grid; grid-template-columns:1fr auto;
+  gap:12px; align-items:center;
+  cursor:pointer;
+  user-select:none;
+}
+.ecard-header:hover { background:var(--sand); }
 .ec-name { font-weight:700; font-size:14px; margin-bottom:3px; }
 .ec-meta { font-size:12px; color:var(--muted); }
 .ecard-actions { display:flex; gap:8px; align-items:center; }
+.ecard-toggle {
+  width:24px; height:24px; display:flex; align-items:center; justify-content:center;
+  color:var(--muted); transition:transform 0.2s; flex-shrink:0;
+}
+.ecard.expanded .ecard-toggle { transform:rotate(180deg); }
+.ecard-body {
+  display:none;
+  padding:0 18px 18px;
+  border-top:1px solid var(--border);
+}
+.ecard.expanded .ecard-body { display:block; animation:fadeUp 0.18s ease; }
+.ecard-controls {
+  display:flex; gap:8px; align-items:center;
+  padding:14px 0 0; border-top:1px solid var(--border); margin-top:14px;
+  flex-wrap:wrap;
+}
 
 /* ── TOAST ── */
 .toastwrap { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
@@ -429,7 +452,10 @@ tbody td { padding:12px 16px; vertical-align:top; color:var(--dark); }
   /* Grids coluna única */
   .row, .row3 { grid-template-columns:1fr !important; }
   .dg { grid-template-columns:1fr !important; }
-  .ecard { grid-template-columns:1fr !important; }
+  .ecard-header { grid-template-columns:1fr auto !important; }
+  .ecard-controls { flex-direction:column; align-items:stretch; }
+  .ecard-controls .btn { width:100%; justify-content:center; }
+  .ecard-controls select { width:100% !important; }
 
   /* Cards menores */
   .card { padding:18px 14px; border-radius:var(--r); }
@@ -1263,35 +1289,117 @@ function renderAdmin(lista) {
   if (!lista.length) { el.innerHTML = '<div class="load-row">Nenhuma demanda encontrada.</div>'; return; }
   el.innerHTML = lista.map(d => {
     const idx = dadosAdm.indexOf(d);
-    const tp = d.tipo==='mov'?'Movimentação':d.tipo==='loc'?'Mesmo auditório':'-';
-    const st = d.status||'Aberto';
-    return `<div class="ecard">
-      <div style="min-width:0">
-        <div class="ec-name" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          ${d.solicitante||'-'}
-          <span style="font-weight:400;color:var(--muted);font-size:13px">· ${d.area||''}</span>
-          <span class="badge ${bcls[st]||'b-aberto'}" style="margin-left:auto">${st==='Aberto'?'⏳ Aguardando Aceite':st}</span>
+    const tp  = d.tipo==='mov'?'Movimentação entre locais':d.tipo==='loc'?'Mesmo auditório':'-';
+    const tpChip = d.tipo==='mov'?'Movimentação':d.tipo==='loc'?'Mesmo auditório':'-';
+    const st  = d.status||'Aberto';
+    const plan = calcPlanejamento(d);
+
+    // ── Conteúdo do detalhe conforme tipo ──
+    let detalhe = '';
+    if (d.tipo==='mov') {
+      detalhe += `
+        <div class="sec-title" style="font-size:10px;margin:14px 0 10px">Ida</div>
+        <div class="dg">
+          <div class="di"><div class="dl">Data</div><div class="dv">${fmtData(d.dia_ida)}</div></div>
+          <div class="di"><div class="dl">Hora</div><div class="dv">${fmtHora(d.hora_ida)}</div></div>
+          <div class="di"><div class="dl">Origem</div><div class="dv">${d.origem_ida||'-'}</div></div>
+          <div class="di"><div class="dl">Destino</div><div class="dv">${d.destino_ida||'-'}</div></div>
+          <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo_ida||'-'}</div></div>
+          <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp_ida||'-'}</div></div>
+          <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel_ida||'-'}</div></div>
+          <div class="di"><div class="dl">Autorização de acesso</div><div class="dv">${d.auth_ida||'Não'}</div></div>
+          ${d.auth_ida==='Sim'?`
+          <div class="di"><div class="dl">Resp. acesso</div><div class="dv">${d.auth_ida_acomp||'-'}</div></div>
+          <div class="di"><div class="dl">Tel. resp. acesso</div><div class="dv">${d.auth_ida_tel||'-'}</div></div>`:''}
+          <div class="di" style="grid-column:1/-1"><div class="dl">Descrição</div><div class="dv">${d.desc_ida||'-'}</div></div>
+        </div>`;
+      if (d.devolucao==='Sim') {
+        detalhe += `
+        <div class="sec-title" style="font-size:10px;margin:14px 0 10px">Devolução</div>
+        <div class="dg">
+          <div class="di"><div class="dl">Data</div><div class="dv">${fmtData(d.dia_dev)}</div></div>
+          <div class="di"><div class="dl">Hora</div><div class="dv">${fmtHora(d.hora_dev)}</div></div>
+          <div class="di"><div class="dl">Origem</div><div class="dv">${d.origem_dev||'-'}</div></div>
+          <div class="di"><div class="dl">Destino</div><div class="dv">${d.destino_dev||'-'}</div></div>
+          <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo_dev||'-'}</div></div>
+          <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp_dev||'-'}</div></div>
+          <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel_dev||'-'}</div></div>
+          <div class="di"><div class="dl">Autorização de acesso</div><div class="dv">${d.auth_dev||'Não'}</div></div>
+          ${d.auth_dev==='Sim'?`
+          <div class="di"><div class="dl">Resp. acesso</div><div class="dv">${d.auth_dev_acomp||'-'}</div></div>
+          <div class="di"><div class="dl">Tel. resp. acesso</div><div class="dv">${d.auth_dev_tel||'-'}</div></div>`:''}
+        </div>`;
+      }
+    }
+    if (d.tipo==='loc') {
+      detalhe += `
+        <div class="dg" style="margin-top:14px">
+          <div class="di"><div class="dl">Data</div><div class="dv">${fmtData(d.dia)}</div></div>
+          <div class="di"><div class="dl">Hora</div><div class="dv">${fmtHora(d.hora)}</div></div>
+          <div class="di"><div class="dl">Local</div><div class="dv">${d.local||'-'}</div></div>
+          <div class="di"><div class="dl">Veículo</div><div class="dv">${d.veiculo||'-'}</div></div>
+          <div class="di"><div class="dl">Acompanhante</div><div class="dv">${d.acomp||'-'}</div></div>
+          <div class="di"><div class="dl">Telefone</div><div class="dv">${d.tel||'-'}</div></div>
+          <div class="di" style="grid-column:1/-1"><div class="dl">Descrição</div><div class="dv">${d.descricao||'-'}</div></div>
+        </div>`;
+    }
+
+    return `<div class="ecard" id="ecard-${idx}">
+      <div class="ecard-header" onclick="toggleEcard(${idx})">
+        <div style="min-width:0">
+          <div class="ec-name" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${d.solicitante||'-'}
+            <span style="font-weight:400;color:var(--muted);font-size:13px">· ${d.area||''}</span>
+            <span class="badge ${bcls[st]||'b-aberto'}" style="margin-left:auto">${st==='Aberto'?'⏳ Aguardando Aceite':st}</span>
+          </div>
+          <div class="ec-meta" style="margin-top:4px">
+            <span class="chip" style="margin-right:6px">${tpChip}</span>
+            ${formatarTs(d.timestamp)}
+            <span style="margin-left:8px">${plan.badge}</span>
+          </div>
         </div>
-        <div class="ec-meta" style="margin-top:4px"><span class="chip" style="margin-right:6px">${tp}</span>${formatarTs(d.timestamp)}</div>
+        <div class="ecard-toggle">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
       </div>
-      <div class="ecard-actions">
-        ${st === 'Aberto' ? `
-          <button class="btn-aceitar" onclick="aceitarDemanda(${idx})">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            Aceitar
+      <div class="ecard-body">
+        <div class="dg" style="margin-top:14px">
+          <div class="di"><div class="dl">Solicitante</div><div class="dv">${d.solicitante||'-'}</div></div>
+          <div class="di"><div class="dl">Área</div><div class="dv">${d.area||'-'}</div></div>
+          <div class="di"><div class="dl">Tipo</div><div class="dv">${tp}</div></div>
+          <div class="di"><div class="dl">Protocolo</div><div class="dv" style="font-family:monospace;font-size:12px">${d.id||'-'}</div></div>
+          <div class="di" style="grid-column:1/-1"><div class="dl">Planejamento</div>
+            <div class="dv" style="display:flex;align-items:center;gap:8px">${plan.badge}<span style="font-size:12px;color:var(--muted)">${plan.info}</span></div>
+          </div>
+        </div>
+        ${detalhe}
+        <div class="sec-title" style="font-size:10px;margin:14px 0 10px">Observações da equipe</div>
+        <p id="obs-txt-${idx}" style="font-size:13px;background:var(--gold-lt);padding:10px 12px;border-radius:var(--r);border-left:3px solid var(--gold);color:${d.observacoes?'var(--dark)':'var(--muted)'}">${d.observacoes||'Nenhuma observação registrada.'}</p>
+        <div class="ecard-controls">
+          ${st === 'Aberto' ? `
+            <button class="btn-aceitar" onclick="aceitarDemanda(${idx})">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Aceitar demanda
+            </button>
+          ` : `
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.08em">Status:</div>
+            <select class="fc" style="font-size:13px;width:auto" id="st-${idx}" onchange="updStatus(${idx})">
+              ${['Aceito - Time Infra','Em execução','Fechado','Cancelado'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          `}
+          <button class="btn btn-ghost btn-sm" style="border:1px solid var(--border2);margin-left:auto" onclick="editObs(${idx})">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Editar Observações
           </button>
-        ` : `
-          <select class="fc" style="font-size:13px" id="st-${idx}" onchange="updStatus(${idx})">
-            ${['Aceito - Time Infra','Em execução','Fechado','Cancelado'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}
-          </select>
-        `}
-        <button class="btn btn-ghost btn-sm" style="border:1px solid var(--border2);flex-shrink:0" onclick="editObs(${idx})" title="Observações">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-          Obs.
-        </button>
+        </div>
       </div>
     </div>`;
   }).join('');
+}
+
+function toggleEcard(idx) {
+  const card = document.getElementById('ecard-' + idx);
+  if (card) card.classList.toggle('expanded');
 }
 
 async function aceitarDemanda(idx) {
@@ -1331,6 +1439,12 @@ function editObs(idx) {
   const obs = prompt('Observações da equipe:', d.observacoes||'');
   if (obs===null) return;
   d.observacoes = obs;
+  // Atualiza o texto visível no card sem recarregar
+  const obsTxt = document.getElementById('obs-txt-' + idx);
+  if (obsTxt) {
+    obsTxt.textContent = obs || 'Nenhuma observação registrada.';
+    obsTxt.style.color = obs ? 'var(--dark)' : 'var(--muted)';
+  }
   fetch(API, {
     method: 'POST',
     cache: 'no-store',
